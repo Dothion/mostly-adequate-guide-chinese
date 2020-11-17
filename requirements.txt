@@ -1,0 +1,4 @@
+myst-parser
+sphinx_fontawesome
+sphinx_rtd_theme
+sphinx-multitoc-numbering
