@@ -1,1 +1,0 @@
-const words = split(' ');
