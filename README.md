@@ -1,4 +1,4 @@
-![](./source/img/cover.png)
+![](./source/img/short_cover.png)
 
 # 函数式编程指北
 
