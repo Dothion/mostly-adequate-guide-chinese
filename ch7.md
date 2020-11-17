@@ -1,4 +1,4 @@
-# Hindley-Milner 类型签名
+# 第 7 章：Hindley-Milner 类型签名
 
 ## 初识类型
 
