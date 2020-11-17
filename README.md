@@ -1,9 +1,12 @@
+![](./source/img/cover.png)
+
+# 函数式编程指北
+
+[![](https://readthedocs.org/projects/magc/badge/?version=latest)](http://magc.rtfd.io/)
+
 > This is the Simplified Chinese translation of *[mostly-adequate-guide](https://github.com/MostlyAdequate/mostly-adequate-guide)*, thank Professor [Franklin Risby](https://github.com/DrBoolean) for his great work!
 
-
-<!-- <img src="images/cover.png"/> -->
-
-# 关于本书
+## 关于本书
 
 这本书的主题是函数范式（functional paradigm），我们将使用 JavaScript 这个世界上最流行的函数式编程语言来讲述这一主题。有人可能会觉得选择 JavaScript 并不明智，因为当前的主流观点认为它是一门命令式（imperative）的语言，并不适合用来讲函数式。但我认为，这是学习函数式编程的最好方式，因为：
 
@@ -22,9 +25,26 @@
 以上说明，强类型的函数式语言毫无疑问将会成为本书所示范式的最佳试验场。JavaScript 是我们学习这种范式的一种手段，将它应用于什么地方则完全取决于你自己。幸运的是，所有的接口都是数学的，因而也是普适的。最终你会发现你习惯了 swiftz、scalaz、haskell 和 purescript，以及其他各种数学偏向的语言。
 
 
-# 未来计划
+## 未来计划
 
 * 第 1 部分是基础知识。这是初版草稿，所以我会及时更正发现的的错误。欢迎提供帮助！
 * 第 2 部分讲述类型类（type class），比如 functor 和 monad，最后会讲到到 traversable。我希望能塞进来一些 monad transformer 相关的知识，再写一个纯函数的应用。
-* 第 3 部分将开始游走于编程实践与学院学究之间。我们将学习 comonad、f-algebra、free monad、yoneda 以及其他一些范畴学概念。
+* 第 3 部分将开始游走于编程实践与学院学究之间。我们将学习 comonad、f-algebra、free monad、米田定理以及其他一些范畴学概念。
+
+
+## LICENSE
+
+本作品采用 [CC BY-SA 4.0](http://creativecommons.org/licenses/by/4.0/) 协议进行许可。
+
+
+## 在线阅读
+
+你可以在 [Read the Docs](http://magc.rtfd.io/) 上阅读本书，或[下载 epub ](https://magc.readthedocs.io/_/downloads/zh_CN/latest/epub/)以获得更好的阅读体验。
+
+
+## 鸣谢
+
+- [MostlyAdequate/mostly-adequate-guide](https://github.com/MostlyAdequate/mostly-adequate-guide)
+
+- [llh911001/mostly-adequate-guide-chinese](https://github.com/llh911001/mostly-adequate-guide-chinese)
 
