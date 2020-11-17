@@ -19,26 +19,31 @@
 我们从一个愚蠢的例子开始。下面是一个海鸥程序，鸟群合并则变成了一个更大的鸟群，繁殖则增加了鸟群的数量，增加的数量就是它们繁殖出来的海鸥的数量。注意这个程序并不是面向对象的良好实践，它只是强调当前这种变量赋值方式的一些弊端。
 
 ```js
-var Flock = function(n) {
-  this.seagulls = n;
-};
+class Flock {
+  constructor(n) {
+    this.seagulls = n;
+  }
 
-Flock.prototype.conjoin = function(other) {
-  this.seagulls += other.seagulls;
-  return this;
-};
+  conjoin(other) {
+    this.seagulls += other.seagulls;
+    return this;
+  }
 
-Flock.prototype.breed = function(other) {
-  this.seagulls = this.seagulls * other.seagulls;
-  return this;
-};
+  breed(other) {
+    this.seagulls = this.seagulls * other.seagulls;
+    return this;
+  }
+}
 
-var flock_a = new Flock(4);
-var flock_b = new Flock(2);
-var flock_c = new Flock(0);
-
-var result = flock_a.conjoin(flock_c).breed(flock_b).conjoin(flock_a.breed(flock_b)).seagulls;
-//=> 32
+const flockA = new Flock(4);
+const flockB = new Flock(2);
+const flockC = new Flock(0);
+const result = flockA
+  .conjoin(flockC)
+  .breed(flockB)
+  .conjoin(flockA.breed(flockB))
+  .seagulls;
+// 32
 ```
 
 我相信没人会写这样糟糕透顶的程序。代码的内部可变状态非常难以追踪，而且，最终的答案还是错的！正确答案是 `16`，但是因为 `flock_a` 在运算过程中永久地改变了，所以得出了错误的结果。这是 IT 部门混乱的表现，非常粗暴的计算方式。
@@ -48,15 +53,15 @@ var result = flock_a.conjoin(flock_c).breed(flock_b).conjoin(flock_a.breed(flock
 我们试试另一种更函数式的写法：
 
 ```js
-var conjoin = function(flock_x, flock_y) { return flock_x + flock_y };
-var breed = function(flock_x, flock_y) { return flock_x * flock_y };
+const conjoin = (flockX, flockY) => flockX + flockY;
+const breed = (flockX, flockY) => flockX * flockY;
 
-var flock_a = 4;
-var flock_b = 2;
-var flock_c = 0;
-
-var result = conjoin(breed(flock_b, conjoin(flock_a, flock_c)), breed(flock_a, flock_b));
-//=>16
+const flockA = 4;
+const flockB = 2;
+const flockC = 0;
+const result =
+    conjoin(breed(flockB, conjoin(flockA, flockC)), breed(flockA, flockB));
+// 16
 ```
 
 很好，这次我们得到了正确的答案，而且少写了很多代码。不过函数嵌套有点让人费解...（我们会在第 5 章解决这个问题）。这种写法也更优雅，不过代码肯定是越直白越好，所以如果我们再深入挖掘，看看这段代码究竟做了什么事，我们会发现，它不过是在进行简单的加（`conjoin`） 和乘（`breed`）运算而已。
@@ -64,44 +69,44 @@ var result = conjoin(breed(flock_b, conjoin(flock_a, flock_c)), breed(flock_a, f
 代码中的两个函数除了函数名有些特殊，其他没有任何难以理解的地方。我们把它们重命名一下，看看它们的真面目。
 
 ```js
-var add = function(x, y) { return x + y };
-var multiply = function(x, y) { return x * y };
+const add = (x, y) => x + y;
+const multiply = (x, y) => x * y;
 
-var flock_a = 4;
-var flock_b = 2;
-var flock_c = 0;
-
-var result = add(multiply(flock_b, add(flock_a, flock_c)), multiply(flock_a, flock_b));
-//=>16
+const flockA = 4;
+const flockB = 2;
+const flockC = 0;
+const result =
+    add(multiply(flockB, add(flockA, flockC)), multiply(flockA, flockB));
+// 16
 ```
 
 这么一来，你会发现我们不过是在运用古人早已获得的知识：
 
 ```js
 // 结合律（assosiative）
-add(add(x, y), z) == add(x, add(y, z));
+add(add(x, y), z) === add(x, add(y, z));
 
 // 交换律（commutative）
-add(x, y) == add(y, x);
+add(x, y) === add(y, x);
 
 // 同一律（identity）
-add(x, 0) == x;
+add(x, 0) === x;
 
 // 分配律（distributive）
-multiply(x, add(y,z)) == add(multiply(x, y), multiply(x, z));
+multiply(x, add(y,z)) === add(multiply(x, y), multiply(x, z));
 ```
 
 是的，这些经典的数学定律迟早会派上用场。不过如果你一时想不起来也没关系，多数人已经很久没复习过这些数学知识了。我们来看看能否运用这些定律简化这个海鸥小程序。
 
 ```js
 // 原有代码
-add(multiply(flock_b, add(flock_a, flock_c)), multiply(flock_a, flock_b));
+add(multiply(flockB, add(flockA, flockC)), multiply(flockA, flockB));
 
 // 应用同一律，去掉多余的加法操作（add(flock_a, flock_c) == flock_a）
-add(multiply(flock_b, flock_a), multiply(flock_a, flock_b));
+add(multiply(flockB, flockA), multiply(flockA, flockB));
 
 // 再应用分配律
-multiply(flock_b, add(flock_a, flock_a));
+multiply(flockB, add(flockA, flockA));
 ```
 
 漂亮！除了调用的函数，一点多余的代码都不需要写。当然这里我们定义 `add` 和 `multiply` 是为了代码完整性，实际上并不必要——在调用之前它们肯定已经在某个类库里定义好了。
@@ -115,5 +120,3 @@ multiply(flock_b, add(flock_a, flock_a));
 我们希望去践行每一部分都能完美接合的理论，希望能以一种通用的、可组合的组件来表示我们的特定问题，然后利用这些组件的特性来解决这些问题。相比命令式（稍后本书将会介绍命令式的精确定义，暂时我们还是先把重点放在函数式上）编程的那种“某某去做某事”的方式，函数式编程将会有更多的约束，不过你会震惊于这种强约束、数学性的“框架”所带来的回报。
 
 我们已经看到函数式的点点星光了，但在真正开始我们的旅程之前，我们要先掌握一些具体的概念。
-
-[第 2 章：一等公民的函数](ch2.md)

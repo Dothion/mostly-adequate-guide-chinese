@@ -15,13 +15,10 @@ JavaScript 也有一些类型检查工具，比如 [Flow](http://flowtype.org/)�
 从积尘已久的数学书，到浩如烟海的学术论文；从每周必读的博客文章，到源代码本身，我们都能发现 Hindley-Milner 类型签名的身影。Hindley-Milner 并不是一个复杂的系统，但还是需要一些解释和练习才能完全掌握这个小型语言的要义。
 
 ```js
-//  capitalize :: String -> String
-var capitalize = function(s){
-  return toUpperCase(head(s)) + toLowerCase(tail(s));
-}
+// capitalize :: String -> String
+const capitalize = s => toUpperCase(head(s)) + toLowerCase(tail(s));
 
-capitalize("smurf");
-//=> "Smurf"
+capitalize('smurf'); // 'Smurf'
 ```
 
 这里，`capitalize` 接受一个 `String` 并返回了一个 `String`。先别管实现，我们感兴趣的是它的类型签名。
@@ -31,25 +28,8 @@ capitalize("smurf");
 再来看一些函数签名：
 
 ```js
-//  strLength :: String -> Number
-var strLength = function(s){
-  return s.length;
-}
-
-//  join :: String -> [String] -> String
-var join = curry(function(what, xs){
-  return xs.join(what);
-});
-
-//  match :: Regex -> String -> [String]
-var match = curry(function(reg, s){
-  return s.match(reg);
-});
-
-//  replace :: Regex -> String -> String -> String
-var replace = curry(function(reg, sub, s){
-  return s.replace(reg, sub);
-});
+// match :: Regex -> (String -> [String])
+const match = curry((reg, s) => s.match(reg));
 ```
 
 `strLength` 和 `capitalize` 类似：接受一个 `String` 然后返回一个 `Number`。
@@ -59,28 +39,23 @@ var replace = curry(function(reg, sub, s){
 对于 `match` 函数，我们完全可以把它的类型签名这样分组：
 
 ```js
-//  match :: Regex -> (String -> [String])
-var match = curry(function(reg, s){
-  return s.match(reg);
-});
+// match :: Regex -> (String -> [String])
+const match = curry((reg, s) => s.match(reg));
 ```
 
 是的，把最后两个类型包在括号里就能反映更多的信息了。现在我们可以看出 `match` 这个函数接受一个 `Regex` 作为参数，返回一个从 `String` 到 `[String]` 的函数。因为 curry，造成的结果就是这样：给 `match` 函数一个 `Regex`，得到一个新函数，能够处理其 `String` 参数。当然了，我们并非一定要这么看待这个过程，但这样思考有助于理解为何最后一个类型是返回值。
 
 ```js
-//  match :: Regex -> (String -> [String])
-
-//  onHoliday :: String -> [String]
-var onHoliday = match(/holiday/ig);
+// match :: Regex -> (String -> [String])
+// onHoliday :: String -> [String]
+const onHoliday = match(/holiday/ig);
 ```
 
 每传一个参数，就会弹出类型签名最前面的那个类型。所以 `onHoliday` 就是已经有了 `Regex` 参数的 `match`。
 
 ```js
-//  replace :: Regex -> (String -> (String -> String))
-var replace = curry(function(reg, sub, s){
-  return s.replace(reg, sub);
-});
+// replace :: Regex -> (String -> (String -> String))
+const replace = curry((reg, sub, s) => s.replace(reg, sub));
 ```
 
 但是在这段代码中，就像你看到的那样，为 `replace` 加上这么多括号未免有些多余。所以这里的括号是完全可以省略的，如果我们愿意，可以一次性把所有的参数都传进来；所以，一种更简单的思路是：`replace` 接受三个参数，分别是 `Regex`、`String` 和另一个 `String`，返回的还是一个 `String`。
@@ -88,13 +63,11 @@ var replace = curry(function(reg, sub, s){
 最后几点：
 
 ```js
-//  id :: a -> a
-var id = function(x){ return x; }
+// id :: a -> a
+const id = x => x;
 
-//  map :: (a -> b) -> [a] -> [b]
-var map = curry(function(f, xs){
-  return xs.map(f);
-});
+// map :: (a -> b) -> [a] -> [b]
+const map = curry((f, xs) => xs.map(f));
 ```
 
 这里的 `id` 函数接受任意类型的 `a` 并返回同一个类型的数据。和普通代码一样，我们也可以在类型签名中使用变量。把变量命名为 `a` 和 `b` 只是一种约定俗成的习惯，你可以使用任何你喜欢的名称。对于相同的变量名，其类型也一定相同。这是非常重要的一个原则，所以我们必须重申：`a -> b` 可以是从任意类型的 `a` 到任意类型的 `b`，但是 `a -> a` 必须是同一个类型。例如，`id` 可以是 `String -> String`，也可以是 `Number -> Number`，但不能是 `String -> Bool`。
@@ -108,18 +81,14 @@ var map = curry(function(f, xs){
 这里还有一些例子，你可以自己试试看能不能理解它们。
 
 ```js
-//  head :: [a] -> a
-var head = function(xs){ return xs[0]; }
+// head :: [a] -> a
+const head = xs => xs[0];
 
-//  filter :: (a -> Bool) -> [a] -> [a]
-var filter = curry(function(f, xs){
-  return xs.filter(f);
-});
+// filter :: (a -> Bool) -> [a] -> [a]
+const filter = curry((f, xs) => xs.filter(f));
 
-//  reduce :: (b -> a -> b) -> b -> [a] -> b
-var reduce = curry(function(f, x, xs){
-  return xs.reduce(f, x);
-});
+// reduce :: ((b, a) -> b) -> b -> [a] -> b
+const reduce = curry((f, x, xs) => xs.reduce(f, x));
 ```
 
 `reduce` 可能是以上签名里让人印象最为深刻的一个，同时也是最复杂的一个了，所以如果你理解起来有困难的话，也不必气馁。为了满足你的好奇心，我还是试着解释一下吧；尽管我的解释远远不如你自己通过类型签名理解其含义来得有教益。
@@ -152,10 +121,10 @@ var reduce = curry(function(f, x, xs){
 
 ```js
 // head :: [a] -> a
-compose(f, head) == compose(head, map(f));
+compose(f, head) === compose(head, map(f));
 
 // filter :: (a -> Bool) -> [a] -> [a]
-compose(map(f), filter(compose(p, f))) == compose(filter(p), map(f));
+compose(map(f), filter(compose(p, f))) === compose(filter(p), map(f));
 ```
 
 不用写一行代码你也能理解这些定理，它们直接来自于类型本身。第一个例子中，等式左边说的是，先获取数组的`头部`（译者注：即第一个元素），然后对它调用函数 `f`；等式右边说的是，先对数组中的每一个元素调用 `f`，然后再取其返回结果的`头部`。这两个表达式的作用是相等的，但是前者要快得多。
@@ -186,5 +155,3 @@ compose(map(f), filter(compose(p, f))) == compose(filter(p), map(f));
 ## 总结
 
 Hindley-Milner 类型签名在函数式编程中无处不在，它们简单易读，写起来也不复杂。但仅仅凭签名就能理解整个程序还是有一定难度的，要想精通这个技能就更需要花点时间了。从这开始，我们将给每一行代码都加上类型签名。
-
-[第 8 章: 特百惠](ch8.md)

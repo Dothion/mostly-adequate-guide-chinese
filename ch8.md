@@ -11,11 +11,15 @@
 首先我们将创建一个容器（container）。这个容器必须能够装载任意类型的值；否则的话，像只能装木薯布丁的密封塑料袋是没什么用的。这个容器将会是一个对象，但我们不会为它添加面向对象观念下的属性和方法。是的，我们将把它当作一个百宝箱——一个存放宝贵的数据的特殊盒子。
 
 ```js
-var Container = function(x) {
-  this.__value = x;
+class Container {
+  constructor(x) {
+    this.$value = x;
+  }
+  
+  static of(x) {
+    return new Container(x);
+  }
 }
-
-Container.of = function(x) { return new Container(x); };
 ```
 
 这是本书的第一个容器，我们贴心地把它命名为 `Container`。我们将使用 `Container.of` 作为构造器（constructor），这样就不用到处去写糟糕的 `new` 关键字了，非常省心。实际上不能这么简单地看待 `of` 函数，但暂时先认为它是把值放到容器里的一种方式。
@@ -23,25 +27,23 @@ Container.of = function(x) { return new Container(x); };
 我们来检验下这个崭新的盒子：
 
 ```js
-Container.of(3)
-//=> Container(3)
+Container.of(3);
+// Container(3)
 
+Container.of('hotdogs');
+// Container("hotdogs")
 
-Container.of("hotdogs")
-//=> Container("hotdogs")
-
-
-Container.of(Container.of({name: "yoda"}))
-//=> Container(Container({name: "yoda" }))
+Container.of(Container.of({ name: 'yoda' }));
+// Container(Container({ name: 'yoda' }))
 ```
 
-如果用的是 node，那么你会看到打印出来的是 `{__value: x}`，而不是实际值 `Container(x)`；Chrome 打印出来的是正确的。不过这并不重要，只要你理解 `Container` 是什么样的就行了。有些环境下，你也可以重写 `inspect` 方法，但我们不打算涉及这方面的知识。在本书中，出于教学和美学上的考虑，我们将把概念性的输出都写成好像 `inspect` 被重写了的样子，因为这样写的教育意义将远远大于 `{__value: x}`。
+如果用的是 node，那么你会看到打印出来的是 `{$value: x}`，而不是实际值 `Container(x)`；Chrome 打印出来的是正确的。不过这并不重要，只要你理解 `Container` 是什么样的就行了。有些环境下，你也可以重写 `inspect` 方法，但我们不打算涉及这方面的知识。在本书中，出于教学和美学上的考虑，我们将把概念性的输出都写成好像 `inspect` 被重写了的样子，因为这样写的教育意义将远远大于 `{$value: x}`。
 
 在继续后面的内容之前，先澄清几点：
 
-* `Container` 是个只有一个属性的对象。尽管容器可以有不止一个的属性，但大多数容器还是只有一个。我们很随意地把 `Container` 的这个属性命名为 `__value`。
-* `__value` 不能是某个特定的类型，不然 `Container` 就对不起它这个名字了。
-* 数据一旦存放到 `Container`，就会一直待在那儿。我们*可以*用 `.__value` 获取到数据，但这样做有悖初衷。
+* `Container` 是个只有一个属性的对象。尽管容器可以有不止一个的属性，但大多数容器还是只有一个。我们很随意地把 `Container` 的这个属性命名为 `$value`。
+* `$value` 不能是某个特定的类型，不然 `Container` 就对不起它这个名字了。
+* 数据一旦存放到 `Container`，就会一直待在那儿。我们*可以*用 `.$value` 获取到数据，但这样做有悖初衷。
 
 如果把容器想象成玻璃罐的话，上面这三条陈述的理由就会比较清晰了。但是暂时，请先保持耐心。
 
@@ -51,24 +53,22 @@ Container.of(Container.of({name: "yoda"}))
 
 ```js
 // (a -> b) -> Container a -> Container b
-Container.prototype.map = function(f){
-  return Container.of(f(this.__value))
-}
+Container.prototype.map = function (f) {
+  return Container.of(f(this.$value));
+};
 ```
 
 这个 `map` 跟数组那个著名的 `map` 一样，除了前者的参数是 `Container a` 而后者是 `[a]`。它们的使用方式也几乎一致：
 
 ```js
-Container.of(2).map(function(two){ return two + 2 })
-//=> Container(4)
+Container.of(2).map(two => two + 2); 
+// Container(4)
 
+Container.of('flamethrowers').map(s => s.toUpperCase()); 
+// Container('FLAMETHROWERS')
 
-Container.of("flamethrowers").map(function(s){ return s.toUpperCase() })
-//=> Container("FLAMETHROWERS")
-
-
-Container.of("bombs").map(concat(' away')).map(_.prop('length'))
-//=> Container(10)
+Container.of('bombs').map(append(' away')).map(prop('length')); 
+// Container(10)
 ```
 
 为什么要使用这样一种方法？因为我们能够在不离开 `Container` 的情况下操作容器里面的值。这是非常了不起的一件事情。`Container` 里的值传递给 `map` 函数之后，就可以任我们操作；操作结束后，为了防止意外再把它放回它所属的 `Container`。这样做的结果是，我们能连续地调用 `map`，运行任何我们想运行的函数。甚至还可以改变值的类型，就像上面最后一个例子中那样。
@@ -88,37 +88,43 @@ Container.of("bombs").map(concat(' away')).map(_.prop('length'))
 说实话 `Container` 挺无聊的，而且通常我们称它为 `Identity`，与 `id` 函数的作用相同（这里也是有数学上的联系的，我们会在适当时候加以说明）。除此之外，还有另外一种 functor，那就是实现了 `map` 函数的类似容器的数据类型，这种 functor 在调用 `map` 的时候能够提供非常有用的行为。现在让我们来定义一个这样的 functor。
 
 ```js
-var Maybe = function(x) {
-  this.__value = x;
-}
+class Maybe {
+  static of(x) {
+    return new Maybe(x);
+  }
 
-Maybe.of = function(x) {
-  return new Maybe(x);
-}
+  get isNothing() {
+    return this.$value === null || this.$value === undefined;
+  }
 
-Maybe.prototype.isNothing = function() {
-  return (this.__value === null || this.__value === undefined);
-}
+  constructor(x) {
+    this.$value = x;
+  }
 
-Maybe.prototype.map = function(f) {
-  return this.isNothing() ? Maybe.of(null) : Maybe.of(f(this.__value));
+  map(fn) {
+    return this.isNothing ? this : Maybe.of(fn(this.$value));
+  }
+
+  inspect() {
+    return this.isNothing ? 'Nothing' : `Just(${inspect(this.$value)})`;
+  }
 }
 ```
 
 `Maybe` 看起来跟 `Container` 非常类似，但是有一点不同：`Maybe` 会先检查自己的值是否为空，然后才调用传进来的函数。这样我们在使用 `map` 的时候就能避免恼人的空值了（注意这个实现出于教学目的做了简化）。
 
 ```js
-Maybe.of("Malkovich Malkovich").map(match(/a/ig));
-//=> Maybe(['a', 'a'])
+Maybe.of('Malkovich Malkovich').map(match(/a/ig));
+// Just(True)
 
 Maybe.of(null).map(match(/a/ig));
-//=> Maybe(null)
+// Nothing
 
-Maybe.of({name: "Boris"}).map(_.prop("age")).map(add(10));
-//=> Maybe(null)
+Maybe.of({ name: 'Boris' }).map(prop('age')).map(add(10));
+// Nothing
 
-Maybe.of({name: "Dinah", age: 14}).map(_.prop("age")).map(add(10));
-//=> Maybe(24)
+Maybe.of({ name: 'Dinah', age: 14 }).map(prop('age')).map(add(10));
+// Just(24)
 ```
 
 注意看，当传给 `map` 的值是 `null` 时，代码并没有爆出错误。这是因为每一次 `Maybe` 要调用函数的时候，都会先检查它自己的值是否为空。
@@ -126,10 +132,8 @@ Maybe.of({name: "Dinah", age: 14}).map(_.prop("age")).map(add(10));
 这种点记法（dot notation syntax）已经足够函数式了，但是正如在第 1 部分指出的那样，我们更想保持一种 pointfree 的风格。碰巧的是，`map` 完全有能力以 curry 函数的方式来“代理”任何 functor：
 
 ```js
-//  map :: Functor f => (a -> b) -> f a -> f b
-var map = curry(function(f, any_functor_at_all) {
-  return any_functor_at_all.map(f);
-});
+// map :: Functor f => (a -> b) -> f a -> f b
+const map = curry((f, anyFunctor) => anyFunctor.map(f));
 ```
 
 这样我们就可以像平常一样使用组合，同时也能正常使用 `map` 了，非常振奋人心。ramda 的 `map` 也是这样。后面的章节中，我们将在点记法更有教育意义的时候使用点记法，在方便使用 pointfree 模式的时候就用 pointfree。你注意到了么？我在类型标签中偷偷引入了一个额外的标记：`Functor f =>`。这个标记告诉我们 `f` 必须是一个 functor。没什么复杂的，但我觉得有必要提一下。
@@ -139,18 +143,17 @@ var map = curry(function(f, any_functor_at_all) {
 实际当中，`Maybe` 最常用在那些可能会无法成功返回结果的函数中。
 
 ```js
-//  safeHead :: [a] -> Maybe(a)
-var safeHead = function(xs) {
-  return Maybe.of(xs[0]);
-};
+// safeHead :: [a] -> Maybe(a)
+const safeHead = xs => Maybe.of(xs[0]);
 
-var streetName = compose(map(_.prop('street')), safeHead, _.prop('addresses'));
+// streetName :: Object -> Maybe String
+const streetName = compose(map(prop('street')), safeHead, prop('addresses'));
 
-streetName({addresses: []});
-// Maybe(null)
+streetName({ addresses: [] });
+// Nothing
 
-streetName({addresses: [{street: "Shady Ln.", number: 4201}]});
-// Maybe("Shady Ln.")
+streetName({ addresses: [{ street: 'Shady Ln.', number: 4201 }] });
+// Just('Shady Ln.')
 ```
 
 `safeHead` 与一般的 `_.head` 类似，但是增加了类型安全保证。引入 `Maybe` 会发生一件非常有意思的事情，那就是我们被迫要与狡猾的 `null` 打交道了。`safeHead` 函数能够诚实地预告它可能的失败——失败真没什么可耻的——然后返回一个 `Maybe` 来通知我们相关信息。实际上不仅仅是*通知*，因为毕竟我们想要的值深藏在 `Maybe` 对象中，而且只能通过 `map` 来操作它。本质上，这是一种由 `safeHead` 强制执行的空值检查。有了这种检查，我们才能在夜里安然入睡，因为我们知道最不受人待见的 `null` 不会突然出现。类似这样的 API 能够把一个像纸糊起来的、脆弱的应用升级为实实在在的、健壮的应用，这样的 API 保证了更加安全的软件。
@@ -158,25 +161,29 @@ streetName({addresses: [{street: "Shady Ln.", number: 4201}]});
 有时候函数可以明确返回一个 `Maybe(null)` 来表明失败，例如：
 
 ```js
-//  withdraw :: Number -> Account -> Maybe(Account)
-var withdraw = curry(function(amount, account) {
-  return account.balance >= amount ?
-    Maybe.of({balance: account.balance - amount}) :
-    Maybe.of(null);
-});
+// withdraw :: Number -> Account -> Maybe(Account)
+const withdraw = curry((amount, { balance }) =>
+  Maybe.of(balance >= amount ? { balance: balance - amount } : null));
 
-//  finishTransaction :: Account -> String
-var finishTransaction = compose(remainingBalance, updateLedger); // <- 假定这两个函数已经在别处定义好了
+// This function is hypothetical, not implemented here... nor anywhere else.
+// updateLedger :: Account -> Account 
+const updateLedger = account => account;
 
-//  getTwenty :: Account -> Maybe(String)
-var getTwenty = compose(map(finishTransaction), withdraw(20));
+// remainingBalance :: Account -> String
+const remainingBalance = ({ balance }) => `Your balance is $${balance}`;
+
+// finishTransaction :: Account -> String
+const finishTransaction = compose(remainingBalance, updateLedger);
 
 
-getTwenty({ balance: 200.00});
-// Maybe("Your balance is $180.00")
+// getTwenty :: Account -> Maybe(String)
+const getTwenty = compose(map(finishTransaction), withdraw(20));
 
-getTwenty({ balance: 10.00});
-// Maybe(null)
+getTwenty({ balance: 200.00 }); 
+// Just('Your balance is $180')
+
+getTwenty({ balance: 10.00 });
+// Nothing
 ```
 
 要是钱不够，`withdraw` 就会对我们嗤之以鼻然后返回一个 `Maybe(null)`。`withdraw` 也显示出了它的多变性，使得我们后续的操作只能用 `map` 来进行。这个例子与前面例子不同的地方在于，这里的 `null` 是有意的。我们不用 `Maybe(String)` ，而是用 `Maybe(null)` 来发送失败的信号，这样程序在收到信号后就能立刻停止执行。这一点很重要：如果 `withdraw` 失败了，`map` 就会切断后续代码的执行，因为它根本就不会运行传递给它的函数，即 `finishTransaction`。这正是预期的效果：如果取款失败，我们并不想更新或者显示账户余额。
@@ -190,22 +197,23 @@ getTwenty({ balance: 10.00});
 不过，对容器里的值来说，还是有个逃生口可以出去。也就是说，如果我们想返回一个自定义的值然后还能继续执行后面的代码的话，是可以做到的；要达到这一目的，可以借助一个帮助函数 `maybe`：
 
 ```js
-//  maybe :: b -> (a -> b) -> Maybe a -> b
-var maybe = curry(function(x, f, m) {
-  return m.isNothing() ? x : f(m.__value);
+// maybe :: b -> (a -> b) -> Maybe a -> b
+const maybe = curry((v, f, m) => {
+  if (m.isNothing) {
+    return v;
+  }
+
+  return f(m.$value);
 });
 
-//  getTwenty :: Account -> String
-var getTwenty = compose(
-  maybe("You're broke!", finishTransaction), withdraw(20)
-);
+// getTwenty :: Account -> String
+const getTwenty = compose(maybe('You\'re broke!', finishTransaction), withdraw(20));
 
+getTwenty({ balance: 200.00 }); 
+// 'Your balance is $180.00'
 
-getTwenty({ balance: 200.00});
-// "Your balance is $180.00"
-
-getTwenty({ balance: 10.00});
-// "You're broke!"
+getTwenty({ balance: 10.00 }); 
+// 'You\'re broke!'
 ```
 
 这样就可以要么返回一个静态值（与 `finishTransaction` 返回值的类型一致），要么继续愉快地在没有 `Maybe` 的情况下完成交易。`maybe` 使我们得以避免普通 `map` 那种命令式的 `if/else` 语句：`if(x !== null) { return f(x) }`。
@@ -222,45 +230,55 @@ getTwenty({ balance: 10.00});
 
 说出来可能会让你震惊，`throw/catch` 并不十分“纯”。当一个错误抛出的时候，我们没有收到返回值，反而是得到了一个警告！抛错的函数吐出一大堆的 0 和 1 作为盾和矛来攻击我们，简直就像是在反击输入值的入侵而进行的一场电子大作战。有了 `Either` 这个新朋友，我们就能以一种比向输入值宣战好得多的方式来处理错误，那就是返回一条非常礼貌的消息作为回应。我们来看一下：
 
+> 附录 B 中有 `Either` 的完整实现
+
 ```js
-var Left = function(x) {
-  this.__value = x;
+class Either {
+  static of(x) {
+    return new Right(x);
+  }
+
+  constructor(x) {
+    this.$value = x;
+  }
 }
 
-Left.of = function(x) {
-  return new Left(x);
+class Left extends Either {
+  map(f) {
+    return this;
+  }
+
+  inspect() {
+    return `Left(${inspect(this.$value)})`;
+  }
 }
 
-Left.prototype.map = function(f) {
-  return this;
+class Right extends Either {
+  map(f) {
+    return Either.of(f(this.$value));
+  }
+
+  inspect() {
+    return `Right(${inspect(this.$value)})`;
+  }
 }
 
-var Right = function(x) {
-  this.__value = x;
-}
-
-Right.of = function(x) {
-  return new Right(x);
-}
-
-Right.prototype.map = function(f) {
-  return Right.of(f(this.__value));
-}
+const left = x => new Left(x);
 ```
 
 `Left` 和 `Right` 是我们称之为 `Either` 的抽象类型的两个子类。我略去了创建 `Either` 父类的繁文缛节，因为我们不会用到它的，但你了解一下也没坏处。注意看，这里除了有两个类型，没别的新鲜东西。来看看它们是怎么运行的：
 
 ```js
-Right.of("rain").map(function(str){ return "b"+str; });
-// Right("brain")
+Either.of('rain').map(str => `b${str}`); 
+// Right('brain')
 
-Left.of("rain").map(function(str){ return "b"+str; });
-// Left("rain")
+left('rain').map(str => `It's gonna ${str}, better bring your umbrella!`); 
+// Left('rain')
 
-Right.of({host: 'localhost', port: 80}).map(_.prop('host'));
+Either.of({ host: 'localhost', port: 80 }).map(prop('host'));
 // Right('localhost')
 
-Left.of("rolls eyes...").map(_.prop("host"));
+left('rolls eyes...').map(prop('host'));
 // Left('rolls eyes...')
 ```
 
@@ -269,37 +287,39 @@ Left.of("rolls eyes...").map(_.prop("host"));
 假设有一个可能会失败的函数，就拿根据生日计算年龄来说好了。的确，我们可以用 `Maybe(null)` 来表示失败并把程序引向另一个分支，但是这并没有告诉我们太多信息。很有可能我们想知道失败的原因是什么。用 `Either` 写一个这样的程序看看：
 
 ```js
-var moment = require('moment');
+const moment = require('moment');
 
-//  getAge :: Date -> User -> Either(String, Number)
-var getAge = curry(function(now, user) {
-  var birthdate = moment(user.birthdate, 'YYYY-MM-DD');
-  if(!birthdate.isValid()) return Left.of("Birth date could not be parsed");
-  return Right.of(now.diff(birthdate, 'years'));
+// getAge :: Date -> User -> Either(String, Number)
+const getAge = curry((now, user) => {
+  const birthDate = moment(user.birthDate, 'YYYY-MM-DD');
+
+  return birthDate.isValid()
+    ? Either.of(now.diff(birthDate, 'years'))
+    : left('Birth date could not be parsed');
 });
 
-getAge(moment(), {birthdate: '2005-12-12'});
+getAge(moment(), { birthDate: '2005-12-12' });
 // Right(9)
 
-getAge(moment(), {birthdate: 'balloons!'});
-// Left("Birth date could not be parsed")
+getAge(moment(), { birthDate: 'July 4, 2001' });
+// Left('Birth date could not be parsed')
 ```
 
 这么一来，就像 `Maybe(null)`，当返回一个 `Left` 的时候就直接让程序短路。跟 `Maybe(null)` 不同的是，现在我们对程序为何脱离原先轨道至少有了一点头绪。有一件事要注意，这里返回的是 `Either(String, Number)`，意味着我们这个 `Either` 左边的值是 `String`，右边（译者注：也就是正确的值）的值是 `Number`。这个类型签名不是很正式，因为我们并没有定义一个真正的 `Either` 父类；但我们还是从这个类型那里了解到不少东西。它告诉我们，我们得到的要么是一条错误消息，要么就是正确的年龄值。
 
 ```js
-//  fortune :: Number -> String
-var fortune  = compose(concat("If you survive, you will be "), add(1));
+// fortune :: Number -> String
+const fortune = compose(concat('If you survive, you will be '), toString, add(1));
 
-//  zoltar :: User -> Either(String, _)
-var zoltar = compose(map(console.log), map(fortune), getAge(moment()));
+// zoltar :: User -> Either(String, _)
+const zoltar = compose(map(console.log), map(fortune), getAge(moment()));
 
-zoltar({birthdate: '2005-12-12'});
-// "If you survive, you will be 10"
+zoltar({ birthDate: '2005-12-12' });
+// 'If you survive, you will be 10'
 // Right(undefined)
 
-zoltar({birthdate: 'balloons!'});
-// Left("Birth date could not be parsed")
+zoltar({ birthDate: 'balloons!' });
+// Left('Birth date could not be parsed')
 ```
 
 如果 `birthdate` 合法，这个程序就会把它神秘的命运打印在屏幕上让我们见证；如果不合法，我们就会收到一个有着清清楚楚的错误消息的 `Left`，尽管这个消息是稳稳当当地待在它的容器里的。这种行为就像，虽然我们在抛错，但是是以一种平静温和的方式抛错，而不是像一个小孩子那样，有什么不对劲就闹脾气大喊大叫。
@@ -315,23 +335,34 @@ zoltar({birthdate: 'balloons!'});
 就像 `Maybe` 可以有个 `maybe` 一样，`Either` 也可以有一个 `either`。两者的用法类似，但 `either` 接受两个函数（而不是一个）和一个静态值为参数。这两个函数的返回值类型一致：
 
 ```js
-//  either :: (a -> c) -> (b -> c) -> Either a b -> c
-var either = curry(function(f, g, e) {
-  switch(e.constructor) {
-    case Left: return f(e.__value);
-    case Right: return g(e.__value);
+// either :: (a -> c) -> (b -> c) -> Either a b -> c
+const either = curry((f, g, e) => {
+  let result;
+
+  switch (e.constructor) {
+    case Left:
+      result = f(e.$value);
+      break;
+
+    case Right:
+      result = g(e.$value);
+      break;
+
+    // No Default
   }
+
+  return result;
 });
 
-//  zoltar :: User -> _
-var zoltar = compose(console.log, either(id, fortune), getAge(moment()));
+// zoltar :: User -> _
+const zoltar = compose(console.log, either(id, fortune), getAge(moment()));
 
-zoltar({birthdate: '2005-12-12'});
-// "If you survive, you will be 10"
+zoltar({ birthDate: '2005-12-12' });
+// 'If you survive, you will be 10'
 // undefined
 
-zoltar({birthdate: 'balloons!'});
-// "Birth date could not be parsed"
+zoltar({ birthDate: 'balloons!' });
+// 'Birth date could not be parsed'
 // undefined
 ```
 
@@ -346,12 +377,8 @@ zoltar({birthdate: 'balloons!'});
 在关于纯函数的的那一章（即第 3 章）里，有一个很奇怪的例子。这个例子中的函数会产生副作用，但是我们通过把它包裹在另一个函数里的方式把它变得看起来像一个纯函数。这里还有一个类似的例子：
 
 ```js
-//  getFromStorage :: String -> (_ -> String)
-var getFromStorage = function(key) {
-  return function() {
-    return localStorage[key];
-  }
-}
+// getFromStorage :: String -> (_ -> String)
+const getFromStorage = key => () => localStorage[key];
 ```
 
 要是我们没把 `getFromStorage` 包在另一个函数里，它的输出值就是不定的，会随外部环境变化而变化。有了这个结实的包裹函数（wrapper），同一个输入就总能返回同一个输出：一个从 `localStorage` 里取出某个特定的元素的函数。就这样（也许再高唱几句赞美圣母的赞歌）我们洗涤了心灵，一切都得到了宽恕。
@@ -359,87 +386,89 @@ var getFromStorage = function(key) {
 然而，这并没有多大的用处，你说是不是。就像是你收藏的全新未拆封的玩偶，不能拿出来玩有什么意思。所以要是能有办法进到这个容器里面，拿到它藏在那儿的东西就好了...办法是有的，请看 `IO`：
 
 ```js
-var IO = function(f) {
-  this.__value = f;
-}
+class IO {
+  static of(x) {
+    return new IO(() => x);
+  }
 
-IO.of = function(x) {
-  return new IO(function() {
-    return x;
-  });
-}
+  constructor(fn) {
+    this.$value = fn;
+  }
 
-IO.prototype.map = function(f) {
-  return new IO(_.compose(f, this.__value));
+  map(fn) {
+    return new IO(compose(fn, this.$value));
+  }
+
+  inspect() {
+    return `IO(${inspect(this.$value)})`;
+  }
 }
 ```
 
-`IO` 跟之前的 functor 不同的地方在于，它的 `__value` 总是一个函数。不过我们不把它当作一个函数——实现的细节我们最好先不管。这里发生的事情跟我们在 `getFromStorage` 那里看到的一模一样：`IO` 把非纯执行动作（impure action）捕获到包裹函数里，目的是延迟执行这个非纯动作。就这一点而言，我们认为 `IO` 包含的是被包裹的执行动作的返回值，而不是包裹函数本身。这在 `of` 函数里很明显：`IO(function(){ return x })` 仅仅是为了延迟执行，其实我们得到的是 `IO(x)`。
+`IO` 跟之前的 functor 不同的地方在于，它的 `$value` 总是一个函数。不过我们不把它当作一个函数——实现的细节我们最好先不管。这里发生的事情跟我们在 `getFromStorage` 那里看到的一模一样：`IO` 把非纯执行动作（impure action）捕获到包裹函数里，目的是延迟执行这个非纯动作。就这一点而言，我们认为 `IO` 包含的是被包裹的执行动作的返回值，而不是包裹函数本身。这在 `of` 函数里很明显：`IO(function(){ return x })` 仅仅是为了延迟执行，其实我们得到的是 `IO(x)`。
 
 来用用看：
 
 ```js
-//  io_window_ :: IO Window
-var io_window = new IO(function(){ return window; });
+// ioWindow :: IO Window
+const ioWindow = new IO(() => window);
 
-io_window.map(function(win){ return win.innerWidth });
+ioWindow.map(win => win.innerWidth);
 // IO(1430)
 
-io_window.map(_.prop('location')).map(_.prop('href')).map(split('/'));
-// IO(["http:", "", "localhost:8000", "blog", "posts"])
+ioWindow
+  .map(prop('location'))
+  .map(prop('href'))
+  .map(split('/'));
+// IO(['http:', '', 'localhost:8000', 'blog', 'posts'])
 
 
-//  $ :: String -> IO [DOM]
-var $ = function(selector) {
-  return new IO(function(){ return document.querySelectorAll(selector); });
-}
+// $ :: String -> IO [DOM]
+const $ = selector => new IO(() => document.querySelectorAll(selector));
 
-$('#myDiv').map(head).map(function(div){ return div.innerHTML; });
+$('#myDiv').map(head).map(div => div.innerHTML);
 // IO('I am some inner html')
 ```
 
-这里，`io_window` 是一个真正的 `IO`，我们可以直接对它使用 `map`。至于 `$`，则是一个函数，调用后会返回一个 `IO`。我把这里的返回值都写成了*概念性*的，这样就更加直观；不过实际的返回值是 `{ __value: [Function] }`。当调用 `IO` 的 `map` 的时候，我们把传进来的函数放在了 `map` 函数里的组合的最末端（也就是最左边），反过来这个函数就成为了新的 `IO` 的新 `__value`，并继续下去。传给 `map` 的函数并没有运行，我们只是把它们压到一个“运行栈”的最末端而已，一个函数紧挨着另一个函数，就像小心摆放的多米诺骨牌一样，让人不敢轻易推倒。这种情形很容易叫人联想起“四人帮”（译者注：《设计模式》一书作者）提出的命令模式（command pattern）或者队列（queue）。
+这里，`io_window` 是一个真正的 `IO`，我们可以直接对它使用 `map`。至于 `$`，则是一个函数，调用后会返回一个 `IO`。我把这里的返回值都写成了*概念性*的，这样就更加直观；不过实际的返回值是 `{ $value: [Function] }`。当调用 `IO` 的 `map` 的时候，我们把传进来的函数放在了 `map` 函数里的组合的最末端（也就是最左边），反过来这个函数就成为了新的 `IO` 的新 `$value`，并继续下去。传给 `map` 的函数并没有运行，我们只是把它们压到一个“运行栈”的最末端而已，一个函数紧挨着另一个函数，就像小心摆放的多米诺骨牌一样，让人不敢轻易推倒。这种情形很容易叫人联想起“四人帮”（译者注：《设计模式》一书作者）提出的命令模式（command pattern）或者队列（queue）。
 
 花点时间找回你关于 functor 的直觉吧。把实现细节放在一边不管，你应该就能自然而然地对各种各样的容器使用 `map` 了，不管它是多么奇特怪异。这种伪超自然的力量要归功于 functor 的定律，我们将在本章末尾对此作一番探索。无论如何，我们终于可以在不牺牲代码纯粹性的情况下，随意使用这些不纯的值了。
 
 好了，我们已经把野兽关进了笼子。但是，在某一时刻还是要把它放出来。因为对 `IO` 调用 `map` 已经积累了太多不纯的操作，最后再运行它无疑会打破平静。问题是在哪里，什么时候打开笼子的开关？而且有没有可能我们只运行 `IO` 却不让不纯的操作弄脏双手？答案是可以的，只要把责任推到调用者身上就行了。我们的纯代码，尽管阴险狡诈诡计多端，但是却始终保持一副清白无辜的模样，反而是实际运行 `IO` 并产生了作用的调用者，背了黑锅。来看一个具体的例子。
 
 ```js
+// url :: IO String
+const url = new IO(() => window.location.href);
 
-////// 纯代码库: lib/params.js ///////
+// toPairs :: String -> [[String]]
+const toPairs = compose(map(split('=')), split('&'));
 
-//  url :: IO String
-var url = new IO(function() { return window.location.href; });
+// params :: String -> [[String]]
+const params = compose(toPairs, last, split('?'));
 
-//  toPairs =  String -> [[String]]
-var toPairs = compose(map(split('=')), split('&'));
+// findParam :: String -> IO Maybe [String]
+const findParam = key => map(compose(Maybe.of, find(compose(eq(key), head)), params), url);
 
-//  params :: String -> [[String]]
-var params = compose(toPairs, last, split('?'));
+// -- Impure calling code ----------------------------------------------
 
-//  findParam :: String -> IO Maybe [String]
-var findParam = function(key) {
-  return map(compose(Maybe.of, filter(compose(eq(key), head)), params), url);
-};
-
-////// 非纯调用代码: main.js ///////
-
-// 调用 __value() 来运行它！
-findParam("searchTerm").__value();
-// Maybe(['searchTerm', 'wafflehouse'])
+// run it by calling $value()!
+findParam('searchTerm').$value();
+// Just(['searchTerm', 'wafflehouse'])
 ```
 
 lib/params.js 把 `url` 包裹在一个 `IO` 里，然后把这头野兽传给了调用者；一双手保持的非常干净。你可能也注意到了，我们把容器也“压栈”了，要知道创建一个 `IO(Maybe([x]))` 没有任何不合理的地方。我们这个“栈”有三层 functor（`Array` 是最有资格成为 mappable 的容器类型），令人印象深刻。
 
-有件事困扰我很久了，现在我必须得说出来：`IO` 的 `__value` 并不是它包含的值，也不是像两个下划线暗示那样是一个私有属性。`__value` 是手榴弹的弹栓，只应该被调用者以最公开的方式拉动。为了提醒用户它的变化无常，我们把它重命名为 `unsafePerformIO` 看看。
+有件事困扰我很久了，现在我必须得说出来：`IO` 的 `$value` 并不是它包含的值，也不是像两个下划线暗示那样是一个私有属性。`$value` 是手榴弹的弹栓，只应该被调用者以最公开的方式拉动。为了提醒用户它的变化无常，我们把它重命名为 `unsafePerformIO` 看看。
 
 ```js
-var IO = function(f) {
-  this.unsafePerformIO = f;
-}
+class IO {
+  constructor(io) {
+    this.unsafePerformIO = io;
+  }
 
-IO.prototype.map = function(f) {
-  return new IO(_.compose(f, this.unsafePerformIO));
+  map(fn) {
+    return new IO(compose(fn, this.unsafePerformIO));
+  }
 }
 ```
 
@@ -455,40 +484,35 @@ IO.prototype.map = function(f) {
 这种方式的内部机制过于复杂，复杂得哪怕我唾沫横飞也很难讲清楚。所以我们就直接用 Quildreen Motta 的 [Folktale](http://folktalejs.org/) 里的 `Data.Task` （之前是 `Data.Future`）。来见证一些例子吧：
 
 ```js
-// Node readfile example:
-//=======================
+// -- Node readFile example ------------------------------------------
 
-var fs = require('fs');
+const fs = require('fs');
 
-//  readFile :: String -> Task(Error, JSON)
-var readFile = function(filename) {
-  return new Task(function(reject, result) {
-    fs.readFile(filename, 'utf-8', function(err, data) {
-      err ? reject(err) : result(data);
-    });
-  });
-};
-
-readFile("metamorphosis").map(split('\n')).map(head);
-// Task("One morning, as Gregor Samsa was waking up from anxious dreams, he discovered that
-// in bed he had been changed into a monstrous verminous bug.")
-
-
-// jQuery getJSON example:
-//========================
-
-//  getJSON :: String -> {} -> Task(Error, JSON)
-var getJSON = curry(function(url, params) {
-  return new Task(function(reject, result) {
-    $.getJSON(url, params, result).fail(reject);
-  });
+// readFile :: String -> Task Error String
+const readFile = filename => new Task((reject, result) => {
+  fs.readFile(filename, (err, data) => (err ? reject(err) : result(data)));
 });
 
-getJSON('/video', {id: 10}).map(_.prop('title'));
-// Task("Family Matters ep 15")
+readFile('metamorphosis').map(split('\n')).map(head);
+// Task('One morning, as Gregor Samsa was waking up from anxious dreams, he discovered that
+// in bed he had been changed into a monstrous verminous bug.')
 
-// 传入普通的实际值也没问题
-Task.of(3).map(function(three){ return three + 1 });
+
+// -- jQuery getJSON example -----------------------------------------
+
+// getJSON :: String -> {} -> Task Error JSON
+const getJSON = curry((url, params) => new Task((reject, result) => {
+  $.getJSON(url, params, result).fail(reject);
+}));
+
+getJSON('/video', { id: 10 }).map(prop('title'));
+// Task('Family Matters ep 15')
+
+
+// -- Default Minimal Context ----------------------------------------
+
+// We can put normal, non futuristic values inside as well
+Task.of(3).map(three => three + 1);
 // Task(4)
 ```
 
@@ -501,25 +525,21 @@ Task.of(3).map(function(three){ return three + 1 });
 我们必须调用 `fork` 方法才能运行 `Task`，这种机制与 `unsafePerformIO` 类似。但也有不同，不同之处就像 `fork` 这个名称表明的那样，它会 fork 一个子进程运行它接收到的参数代码，其他部分的执行不受影响，主线程也不会阻塞。当然这种效果也可以用其他一些技术比如线程实现，但这里的这种方法工作起来就像是一个普通的异步调用，而且 event loop 能够不受影响地继续运转。我们来看一下 `fork`：
 
 ```js
-// Pure application
-//=====================
-// blogTemplate :: String
+// -- Pure application -------------------------------------------------
+// blogPage :: Posts -> HTML
+const blogPage = Handlebars.compile(blogTemplate);
 
-//  blogPage :: Posts -> HTML
-var blogPage = Handlebars.compile(blogTemplate);
+// renderPage :: Posts -> HTML
+const renderPage = compose(blogPage, sortBy(prop('date')));
 
-//  renderPage :: Posts -> HTML
-var renderPage = compose(blogPage, sortBy('date'));
-
-//  blog :: Params -> Task(Error, HTML)
-var blog = compose(map(renderPage), getJSON('/posts'));
+// blog :: Params -> Task Error HTML
+const blog = compose(map(renderPage), getJSON('/posts'));
 
 
-// Impure calling code
-//=====================
+// -- Impure calling code ----------------------------------------------
 blog({}).fork(
-  function(error){ $("#error").html(error.message); },
-  function(page){ $("#main").html(page); }
+  error => $('#error').html(error.message),
+  page => $('#main').html(page),
 );
 
 $('#spinner').show();
@@ -538,27 +558,29 @@ $('#spinner').show();
 // runQuery :: DbConnection -> ResultSet
 // readFile :: String -> Task Error String
 
-// Pure application
-//=====================
+// -- Pure application -------------------------------------------------
 
-//  dbUrl :: Config -> Either Error Url
-var dbUrl = function(c) {
-  return (c.uname && c.pass && c.host && c.db)
-    ? Right.of("db:pg://"+c.uname+":"+c.pass+"@"+c.host+"5432/"+c.db)
-    : Left.of(Error("Invalid config!"));
-}
+// dbUrl :: Config -> Either Error Url
+const dbUrl = ({ uname, pass, host, db }) => {
+  if (uname && pass && host && db) {
+    return Either.of(`db:pg://${uname}:${pass}@${host}5432/${db}`);
+  }
 
-//  connectDb :: Config -> Either Error (IO DbConnection)
-var connectDb = compose(map(Postgres.connect), dbUrl);
+  return left(Error('Invalid config!'));
+};
 
-//  getConfig :: Filename -> Task Error (Either Error (IO DbConnection))
-var getConfig = compose(map(compose(connectDB, JSON.parse)), readFile);
+// connectDb :: Config -> Either Error (IO DbConnection)
+const connectDb = compose(map(Postgres.connect), dbUrl);
+
+// getConfig :: Filename -> Task Error (Either Error (IO DbConnection))
+const getConfig = compose(map(compose(connectDb, JSON.parse)), readFile);
 
 
-// Impure calling code
-//=====================
-getConfig("db.json").fork(
-  logErr("couldn't read file"), either(console.log, map(runQuery))
+// -- Impure calling code ----------------------------------------------
+
+getConfig('db.json').fork(
+  logErr('couldn\'t read file'),
+  either(console.log, map(runQuery)),
 );
 ```
 
@@ -584,27 +606,21 @@ compose(map(f), map(g)) === map(compose(f, g));
 *同一律*很简单，但是也很重要。因为这些定律都是可运行的代码，所以我们完全可以在我们自己的 functor 上试验它们，验证它们是否成立。
 
 ```js
-var idLaw1 = map(id);
-var idLaw2 = id;
+const idLaw1 = map(id);
+const idLaw2 = id;
 
-idLaw1(Container.of(2));
-//=> Container(2)
-
-idLaw2(Container.of(2));
-//=> Container(2)
+idLaw1(Container.of(2)); // Container(2)
+idLaw2(Container.of(2)); // Container(2)
 ```
 
 看到没，它们是相等的。接下来看一看组合。
 
 ```js
-var compLaw1 = compose(map(concat(" world")), map(concat(" cruel")));
-var compLaw2 = map(compose(concat(" world"), concat(" cruel")));
+const compLaw1 = compose(map(append(' world')), map(append(' cruel')));
+const compLaw2 = map(compose(append(' world'), append(' cruel')));
 
-compLaw1(Container.of("Goodbye"));
-//=> Container('Goodbye cruel world')
-
-compLaw2(Container.of("Goodbye"));
-//=> Container('Goodbye cruel world')
+compLaw1(Container.of('Goodbye')); // Container('Goodbye cruel world')
+compLaw2(Container.of('Goodbye')); // Container('Goodbye cruel world')
 ```
 
 在范畴学中，functor 接受一个范畴的对象和态射（morphism），然后把它们映射（map）到另一个范畴里去。根据定义，这个新范畴一定会有一个单位元（identity），也一定能够组合态射；我们无须验证这一点，前面提到的定律保证这些东西会在映射后得到保留。
@@ -622,18 +638,14 @@ compLaw2(Container.of("Goodbye"));
 这张图除了能表示态射借助 functor `F` 完成从一个范畴到另一个范畴的映射之外，我们发现它还符合交换律，也就是说，顺着箭头的方向往前，形成的每一个路径都指向同一个结果。不同的路径意味着不同的行为，但最终都会得到同一个数据类型。这种形式化给了我们原则性的方式去思考代码——无须分析和评估每一个单独的场景，只管可以大胆地应用公式即可。来看一个具体的例子。
 
 ```js
-//  topRoute :: String -> Maybe(String)
-var topRoute = compose(Maybe.of, reverse);
+// topRoute :: String -> Maybe String
+const topRoute = compose(Maybe.of, reverse);
 
-//  bottomRoute :: String -> Maybe(String)
-var bottomRoute = compose(map(reverse), Maybe.of);
+// bottomRoute :: String -> Maybe String
+const bottomRoute = compose(map(reverse), Maybe.of);
 
-
-topRoute("hi");
-// Maybe("ih")
-
-bottomRoute("hi");
-// Maybe("ih")
+topRoute('hi'); // Just('ih')
+bottomRoute('hi'); // Just('ih')
 ```
 
 或者看图：
@@ -654,23 +666,29 @@ map(map(map(toUpperCase)), nested);
 `nested` 是一个将来的数组，数组的元素有可能是程序抛出的错误。我们使用 `map` 剥开每一层的嵌套，然后对数组的元素调用传递进去的函数。可以看到，这中间没有回调、`if/else` 语句和 `for` 循环，只有一个明确的上下文。的确，我们必须要 `map(map(map(f)))` 才能最终运行函数。不想这么做的话，可以组合 functor。是的，你没听错：
 
 ```js
-var Compose = function(f_g_x){
-  this.getCompose = f_g_x;
+class Compose {
+  constructor(fgx) {
+    this.getCompose = fgx;
+  }
+
+  static of(fgx) {
+    return new Compose(fgx);
+  }
+
+  map(fn) {
+    return new Compose(map(map(fn), this.getCompose));
+  }
 }
 
-Compose.prototype.map = function(f){
-  return new Compose(map(map(f), this.getCompose));
-}
+const tmd = Task.of(Maybe.of('Rock over London'));
 
-var tmd = Task.of(Maybe.of("Rock over London"))
+const ctmd = Compose.of(tmd);
 
-var ctmd = new Compose(tmd);
+const ctmd2 = map(append(', rock on, Chicago'), ctmd);
+// Compose(Task(Just('Rock over London, rock on, Chicago')))
 
-map(concat(", rock on, Chicago"), ctmd);
-// Compose(Task(Maybe("Rock over London, rock on, Chicago")))
-
-ctmd.getCompose;
-// Task(Maybe("Rock over London, rock on, Chicago"))
+ctmd2.getCompose;
+// Task(Just('Rock over London, rock on, Chicago'))
 ```
 
 看，只有一个 `map`。functor 组合是符合结合律的，而且之前我们定义的 `Container` 实际上是一个叫 `Identity` 的 functor。identity 和可结合的组合也能产生一个范畴，这个特殊的范畴的对象是其他范畴，态射是 functor。这实在太伤脑筋了，所以我们不会深入这个问题，但是赞叹一下这种模式的结构性含义，或者它的简单的抽象之美也是好的。
@@ -682,107 +700,55 @@ ctmd.getCompose;
 
 用多个 functor 参数调用一个函数怎么样呢？处理一个由不纯的或者异步的操作组成的有序序列怎么样呢？要应对这个什么都装在盒子里的世界，目前我们工具箱里的工具还不全。下一章，我们将直奔 monad 而去。
 
-[第 9 章: Monad](ch9.md)
-
 ## 练习
 
+1. 用 `add` 和 `map` 来创建一个能让 functor 里的值增加的函数
+
 ```js
-require('../../support');
-var Task = require('data.task');
-var _ = require('ramda');
+// incrF :: Functor f => f Int -> f Int  
+const incrF = undefined;  
+```
 
-// 练习 1
-// ==========
-// 使用 _.add(x,y) 和 _.map(f,x) 创建一个能让 functor 里的值增加的函数
+2. 给定以下形式的数据
 
-var ex1 = undefined
+```js
+const user = { id: 2, name: 'Albert', active: true };  
+```
 
+使用 `safeProp` 和 `head` 获取 user 的名字的首字母
 
+```js
+// initial :: User -> Maybe String  
+const initial = undefined;  
+```
 
-//练习 2
-// ==========
-// 使用 _.head 获取列表的第一个元素
-var xs = Identity.of(['do', 'ray', 'me', 'fa', 'so', 'la', 'ti', 'do']);
+3. 给定以下辅助函数
 
-var ex2 = undefined
+```js
+// showWelcome :: User -> String
+const showWelcome = compose(append('Welcome '), prop('name'));
 
-
-
-// 练习 3
-// ==========
-// 使用 safeProp 和 _.head 找到 user 的名字的首字母
-var safeProp = _.curry(function (x, o) { return Maybe.of(o[x]); });
-
-var user = { id: 2, name: "Albert" };
-
-var ex3 = undefined
-
-
-// 练习 4
-// ==========
-// 使用 Maybe 重写 ex4，不要有 if 语句
-
-var ex4 = function (n) {
-  if (n) { return parseInt(n); }
+// checkActive :: User -> Either String User
+const checkActive = function checkActive(user) {
+  return user.active
+    ? Either.of(user)
+    : left('Your account is not active');
 };
+```
 
-var ex4 = undefined
+写一个函数，使用 `checkActive` 和 `showWelcome` 分别允许访问或返回错误
 
+```js
+// eitherWelcome :: User -> Either String String
+const eitherWelcome = undefined;
+```
 
+4. 写一个 `validateName` 函数，检查参数是否 `length > 3`。如果是就返回 `Right(x)`，否则就返回 `Left("You need > 3")`。然后，用 `either`、`showWelcome` 和 `save` 写一个 `refister` 函数用于用户的注册和欢迎。别忘了 either 的两个参数必须返回同一类型的数据。
 
-// 练习 5
-// ==========
-// 写一个函数，先 getPost 获取一篇文章，然后 toUpperCase 让这片文章标题变为大写
+```js
+// validateName :: User -> Either String ()
+const validateName = undefined;
 
-// getPost :: Int -> Future({id: Int, title: String})
-var getPost = function (i) {
-  return new Task(function(rej, res) {
-    setTimeout(function(){
-      res({id: i, title: 'Love them futures'})
-    }, 300)
-  });
-}
-
-var ex5 = undefined
-
-
-
-// 练习 6
-// ==========
-// 写一个函数，使用 checkActive() 和 showWelcome() 分别允许访问或返回错误
-
-var showWelcome = _.compose(_.add( "Welcome "), _.prop('name'))
-
-var checkActive = function(user) {
- return user.active ? Right.of(user) : Left.of('Your account is not active')
-}
-
-var ex6 = undefined
-
-
-
-// 练习 7
-// ==========
-// 写一个验证函数，检查参数是否 length > 3。如果是就返回 Right(x)，否则就返回
-// Left("You need > 3")
-
-var ex7 = function(x) {
-  return undefined // <--- write me. (don't be pointfree)
-}
-
-
-
-// 练习 8
-// ==========
-// 使用练习 7 的 ex7 和 Either 构造一个 functor，如果一个 user 合法就保存它，否则
-// 返回错误消息。别忘了 either 的两个参数必须返回同一类型的数据。
-
-var save = function(x){
-  return new IO(function(){
-    console.log("SAVED USER!");
-    return x + '-saved';
-  });
-}
-
-var ex8 = undefined
+// register :: User -> IO String
+const register = compose(undefined, validateUser(validateName));
 ```

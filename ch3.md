@@ -9,28 +9,22 @@
 比如 `slice` 和 `splice`，这两个函数的作用并无二致——但是注意，它们各自的方式却大不同，但不管怎么说作用还是一样的。我们说 `slice` 符合*纯*函数的定义是因为对相同的输入它保证能返回相同的输出。而 `splice` 却会嚼烂调用它的那个数组，然后再吐出来；这就会产生可观察到的副作用，即这个数组永久地改变了。
 
 ```js
-var xs = [1,2,3,4,5];
+const xs = [1,2,3,4,5];
 
 // 纯的
-xs.slice(0,3);
-//=> [1,2,3]
+xs.slice(0,3); // [1,2,3]
 
-xs.slice(0,3);
-//=> [1,2,3]
+xs.slice(0,3); // [1,2,3]
 
-xs.slice(0,3);
-//=> [1,2,3]
+xs.slice(0,3); // [1,2,3]
 
 
 // 不纯的
-xs.splice(0,3);
-//=> [1,2,3]
+xs.splice(0,3); // [1,2,3]
 
-xs.splice(0,3);
-//=> [4,5]
+xs.splice(0,3); // [4,5]
 
-xs.splice(0,3);
-//=> []
+xs.splice(0,3); // []
 ```
 
 在函数式编程中，我们讨厌这种会*改变*数据的笨函数。我们追求的是那种可靠的，每次都能返回同样结果的函数，而不是像 `splice` 这样每次调用后都把数据弄得一团糟的函数，这不是我们想要的。
@@ -39,16 +33,12 @@ xs.splice(0,3);
 
 ```js
 // 不纯的
-var minimum = 21;
-
-var checkAge = function(age) {
-  return age >= minimum;
-};
-
+let minimum = 21;
+const checkAge = age => age >= minimum;
 
 // 纯的
-var checkAge = function(age) {
-  var minimum = 21;
+const checkAge = (age) => {
+  const minimum = 21;
   return age >= minimum;
 };
 ```
@@ -60,9 +50,7 @@ var checkAge = function(age) {
 另一方面，使用纯函数的形式，函数就能做到自给自足。我们也可以让 `minimum` 成为一个不可变（immutable）对象，这样就能保留纯粹性，因为状态不会有变化。要实现这个效果，必须得创建一个对象，然后调用 `Object.freeze` 方法：
 
 ```js
-var immutableState = Object.freeze({
-  minimum: 21
-});
+const immutableState = Object.freeze({ minimum: 21 });
 ```
 
 ## 副作用可能包括...
@@ -119,15 +107,25 @@ var immutableState = Object.freeze({
 如果输入直接指明了输出，那么就没有必要再实现具体的细节了。因为函数仅仅只是输入到输出的映射而已，所以简单地写一个对象就能“运行”它，使用 `[]` 代替 `()` 即可。
 
 ```js
-var toLowerCase = {"A":"a", "B": "b", "C": "c", "D": "d", "E": "e", "D": "d"};
+const toLowerCase = {
+  A: 'a',
+  B: 'b',
+  C: 'c',
+  D: 'd',
+  E: 'e',
+  F: 'f',
+};
+toLowerCase['C']; // 'c'
 
-toLowerCase["C"];
-//=> "c"
-
-var isPrime = {1:false, 2: true, 3: true, 4: false, 5: true, 6:false};
-
-isPrime[3];
-//=> true
+const isPrime = {
+  1: false,
+  2: true,
+  3: true,
+  4: false,
+  5: true,
+  6: false,
+};
+isPrime[3]; // true
 ```
 
 当然了，实际情况中你可能需要进行一些计算而不是手动指定各项值；不过上例倒是表明了另外一种思考函数的方式。（你可能会想“要是函数有多个参数呢？”。的确，这种情况表明了以数学方式思考问题的一点点不便。暂时我们可以把它们打包放到数组里，或者把 `arguments` 对象看成是输入。等学习 `curry` 的概念之后，你就知道如何直接为函数在数学上的定义建模了。）
@@ -141,31 +139,27 @@ isPrime[3];
 首先，纯函数总能够根据输入来做缓存。实现缓存的一种典型方式是 memoize 技术：
 
 ```js
-var squareNumber  = memoize(function(x){ return x*x; });
+const squareNumber = memoize(x => x * x);
 
-squareNumber(4);
-//=> 16
+squareNumber(4); // 16
 
-squareNumber(4); // 从缓存中读取输入值为 4 的结果
-//=> 16
+squareNumber(4); // 16, 从缓存中读取了 squareNumber(4) 的结果
 
-squareNumber(5);
-//=> 25
+squareNumber(5); // 25
 
-squareNumber(5); // 从缓存中读取输入值为 5 的结果
-//=> 25
+squareNumber(5); // 25, 从缓存中读取了 squareNumber(5) 的结果
 ```
 
 下面的代码是一个简单的实现，尽管它不太健壮。
 
 ```js
-var memoize = function(f) {
-  var cache = {};
+const memoize = (f) => {
+  const cache = {};
 
-  return function() {
-    var arg_str = JSON.stringify(arguments);
-    cache[arg_str] = cache[arg_str] || f.apply(f, arguments);
-    return cache[arg_str];
+  return (...args) => {
+    const argStr = JSON.stringify(args);
+    cache[argStr] = cache[argStr] || f(...args);
+    return cache[argStr];
   };
 };
 ```
@@ -173,9 +167,7 @@ var memoize = function(f) {
 值得注意的一点是，可以通过延迟执行的方式把不纯的函数转换为纯函数：
 
 ```js
-var pureHttpCall = memoize(function(url, params){
-  return function() { return $.getJSON(url, params); }
-});
+const pureHttpCall = memoize((url, params) => () => $.getJSON(url, params));
 ```
 
 这里有趣的地方在于我们并没有真正发送 http 请求——只是返回了一个函数，当调用它的时候才会发请求。这个函数之所以有资格成为纯函数，是因为它总是会根据相同的输入返回相同的输出：给定了 `url` 和 `params` 之后，它就只会返回同一个发送 http 请求的函数。
@@ -190,35 +182,15 @@ var pureHttpCall = memoize(function(url, params){
 
 ```js
 // 不纯的
-var signUp = function(attrs) {
-  var user = saveUser(attrs);
+const signUp = (attrs) => {
+  const user = saveUser(attrs);
   welcomeUser(user);
 };
 
-var saveUser = function(attrs) {
-    var user = Db.save(attrs);
-    ...
-};
-
-var welcomeUser = function(user) {
-    Email(user, ...);
-    ...
-};
-
 // 纯的
-var signUp = function(Db, Email, attrs) {
-  return function() {
-    var user = saveUser(Db, attrs);
-    welcomeUser(Email, user);
-  };
-};
-
-var saveUser = function(Db, attrs) {
-    ...
-};
-
-var welcomeUser = function(Email, user) {
-    ...
+const signUp = (Db, Email, attrs) => () => {
+  const user = saveUser(Db, attrs);
+  welcomeUser(Email, user);
 };
 ```
 
@@ -247,29 +219,16 @@ var welcomeUser = function(Email, user) {
 由于纯函数总是能够根据相同的输入返回相同的输出，所以它们就能够保证总是返回同一个结果，这也就保证了引用透明性。我们来看一个例子。
 
 ```js
-var Immutable = require('immutable');
+const { Map } = require('immutable');
 
-var decrementHP = function(player) {
-  return player.set("hp", player.hp-1);
-};
+// Aliases: p = player, a = attacker, t = target
+const jobe = Map({ name: 'Jobe', hp: 20, team: 'red' });
+const michael = Map({ name: 'Michael', hp: 20, team: 'green' });
+const decrementHP = p => p.set('hp', p.get('hp') - 1);
+const isSameTeam = (p1, p2) => p1.get('team') === p2.get('team');
+const punch = (a, t) => (isSameTeam(a, t) ? t : decrementHP(t));
 
-var isSameTeam = function(player1, player2) {
-  return player1.team === player2.team;
-};
-
-var punch = function(player, target) {
-  if(isSameTeam(player, target)) {
-    return target;
-  } else {
-    return decrementHP(target);
-  }
-};
-
-var jobe = Immutable.Map({name:"Jobe", hp:20, team: "red"});
-var michael = Immutable.Map({name:"Michael", hp:20, team: "green"});
-
-punch(jobe, michael);
-//=> Immutable.Map({name:"Michael", hp:19, team: "green"})
+punch(jobe, michael); // Map({name:'Michael', hp:19, team: 'green'})
 ```
 
 `decrementHP`、`isSameTeam` 和 `punch` 都是纯函数，所以是引用透明的。我们可以使用一种叫做“等式推导”（equational reasoning）的技术来分析代码。所谓“等式推导”就是“一对一”替换，有点像在不考虑程序性执行的怪异行为（quirks of programmatic evaluation）的情况下，手动执行相关代码。我们借助引用透明性来剖析一下这段代码。
@@ -277,41 +236,25 @@ punch(jobe, michael);
 首先内联 `isSameTeam` 函数：
 
 ```js
-var punch = function(player, target) {
-  if(player.team === target.team) {
-    return target;
-  } else {
-    return decrementHP(target);
-  }
-};
+const punch = (a, t) => (a.get('team') === t.get('team') ? t : decrementHP(t));
 ```
 
 因为是不可变数据，我们可以直接把 `team` 替换为实际值：
 
 ```js
-var punch = function(player, target) {
-  if("red" === "green") {
-    return target;
-  } else {
-    return decrementHP(target);
-  }
-};
+const punch = (a, t) => ('red' === 'green' ? t : decrementHP(t));
 ```
 
 `if` 语句执行结果为 `false`，所以可以把整个 `if` 语句都删掉：
 
 ```js
-var punch = function(player, target) {
-  return decrementHP(target);
-};
+const punch = (a, t) => decrementHP(t);
 ```
 
 如果再内联 `decrementHP`，我们会发现这种情况下，`punch` 变成了一个让 `hp` 的值减 1 的调用：
 
 ```js
-var punch = function(player, target) {
-  return target.set("hp", target.hp-1);
-};
+const punch = (a, t) => t.set('hp', t.get('hp') - 1);
 ```
 
 总之，等式推导带来的分析代码的能力对重构和理解代码非常重要。事实上，我们重构海鸥程序使用的正是这项技术：利用加和乘的特性。对这些技术的使用将会贯穿本书，真的。
@@ -327,5 +270,3 @@ var punch = function(player, target) {
 我们已经了解什么是纯函数了，也看到作为函数式程序员的我们，为何深信纯函数是不同凡响的。从这开始，我们将尽力以纯函数式的方式书写所有的函数。为此我们将需要一些额外的工具来达成目标，同时也尽量把非纯函数从纯函数代码中分离。
 
 如果手头没有一些工具，那么纯函数程序写起来就有点费力。我们不得不玩杂耍似的通过到处传递参数来操作数据，而且还被禁止使用状态，更别说“作用”了。没有人愿意这样自虐。所以让我们来学习一个叫 curry 的新工具。
-
-[第 4 章: 柯里化（curry）](ch4.md)

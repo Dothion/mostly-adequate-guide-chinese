@@ -122,7 +122,7 @@ const compact = xs => xs.filter(x => x !== null && x !== undefined);
 有一点我必须得指出，你一定要非常小心 `this` 值，别让它反咬你一口，这一点与面向对象代码类似。如果一个底层函数使用了 `this`，而且是以一等公民的方式被调用的，那你就等着 JS 这个蹩脚的抽象概念发怒吧。
 
 ```js
-var fs = require('fs');
+const fs = require('fs');
 
 // 太可怕了
 fs.readFile('freaky_friday.txt', Db.save);
@@ -137,5 +137,3 @@ fs.readFile('freaky_friday.txt', Db.save.bind(Db));
 也有人反驳说 `this` 能提高执行速度。如果你是这种对速度吹毛求疵的人，那你还是合上这本书吧。要是没法退货退款，也许你可以去换一本更入门的书来读。
 
 至此，我们才准备好继续后面的章节。
-
-[第 3 章: 纯函数的好处](ch3.md)
