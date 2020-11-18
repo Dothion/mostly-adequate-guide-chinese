@@ -33,6 +33,7 @@ extensions = [
     "sphinx_multitoc_numbering",
     'sphinx.ext.duration',
     "sphinx_rtd_theme",
+#    'rinoh.frontend.sphinx',
 ]
 
 myst_heading_anchors = 2
@@ -66,9 +67,17 @@ html_theme = "sphinx_rtd_theme"
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
-# -- Options for LaTeX output -------------------------------------------------
+# -- Options for rinoh output -------------------------------------------------
 
-# latex_engine = 'xelatex'
+# rinoh_documents = [('index',          
+#                     'magc',           
+#                     '函数式编程指北',   
+#                     'Franklin Risby')]
+                    
+# -- Options for epub output -------------------------------------------------
+
+epub_description = '函数式编程指北 中文版'
+epub_cover = './img/cover.png'
 # latex_use_xindy = False
 # latex_elements = {
 #     'preamble': '\\usepackage[UTF8]{ctex}\n',

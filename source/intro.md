@@ -1,5 +1,3 @@
-![](./img/cover.png)
-
 # 函数式编程指北
 
 > This is the Simplified Chinese translation of *[mostly-adequate-guide](https://github.com/MostlyAdequate/mostly-adequate-guide)*, thank Professor [Franklin Risby](https://github.com/DrBoolean) for his great work!
