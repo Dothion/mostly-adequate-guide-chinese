@@ -61,13 +61,13 @@ Container.prototype.map = function (f) {
 这个 `map` 跟数组那个著名的 `map` 一样，除了前者的参数是 `Container a` 而后者是 `[a]`。它们的使用方式也几乎一致：
 
 ```javascript
-Container.of(2).map(two => two + 2); 
+Container.of(2).map(two => two + 2);
 // Container(4)
 
-Container.of('flamethrowers').map(s => s.toUpperCase()); 
+Container.of('flamethrowers').map(s => s.toUpperCase());
 // Container('FLAMETHROWERS')
 
-Container.of('bombs').map(append(' away')).map(prop('length')); 
+Container.of('bombs').map(append(' away')).map(prop('length'));
 // Container(10)
 ```
 
@@ -166,7 +166,7 @@ const withdraw = curry((amount, { balance }) =>
   Maybe.of(balance >= amount ? { balance: balance - amount } : null));
 
 // This function is hypothetical, not implemented here... nor anywhere else.
-// updateLedger :: Account -> Account 
+// updateLedger :: Account -> Account
 const updateLedger = account => account;
 
 // remainingBalance :: Account -> String
@@ -175,11 +175,10 @@ const remainingBalance = ({ balance }) => `Your balance is $${balance}`;
 // finishTransaction :: Account -> String
 const finishTransaction = compose(remainingBalance, updateLedger);
 
-
 // getTwenty :: Account -> Maybe(String)
 const getTwenty = compose(map(finishTransaction), withdraw(20));
 
-getTwenty({ balance: 200.00 }); 
+getTwenty({ balance: 200.00 });
 // Just('Your balance is $180')
 
 getTwenty({ balance: 10.00 });
@@ -209,10 +208,10 @@ const maybe = curry((v, f, m) => {
 // getTwenty :: Account -> String
 const getTwenty = compose(maybe('You\'re broke!', finishTransaction), withdraw(20));
 
-getTwenty({ balance: 200.00 }); 
+getTwenty({ balance: 200.00 });
 // 'Your balance is $180.00'
 
-getTwenty({ balance: 10.00 }); 
+getTwenty({ balance: 10.00 });
 // 'You\'re broke!'
 ```
 
@@ -269,10 +268,10 @@ const left = x => new Left(x);
 `Left` 和 `Right` 是我们称之为 `Either` 的抽象类型的两个子类。我略去了创建 `Either` 父类的繁文缛节，因为我们不会用到它的，但你了解一下也没坏处。注意看，这里除了有两个类型，没别的新鲜东西。来看看它们是怎么运行的：
 
 ```javascript
-Either.of('rain').map(str => `b${str}`); 
+Either.of('rain').map(str => `b${str}`);
 // Right('brain')
 
-left('rain').map(str => `It's gonna ${str}, better bring your umbrella!`); 
+left('rain').map(str => `It's gonna ${str}, better bring your umbrella!`);
 // Left('rain')
 
 Either.of({ host: 'localhost', port: 80 }).map(prop('host'));
@@ -368,7 +367,7 @@ zoltar({ birthDate: 'balloons!' });
 
 终于用了一回那个神秘的 `id` 函数！其实它就是简单地复制了 `Left` 里的错误消息，然后把这个值传给 `console.log` 而已。通过强制在 `getAge` 内部进行错误处理，我们的算命程序更加健壮了。结果就是，要么告诉用户一个残酷的事实并像算命师那样跟他击掌，要么就继续运行程序。好了，现在我们已经准备好去学习一个完全不同类型的 functor 了。
 
-## 王老先生有作用...
+## 王老先生有作用…
 
 （译者注：原标题是“Old McDonald had Effects...”，源于美国儿歌“Old McDonald Had a Farm”。）
 
@@ -421,7 +420,6 @@ ioWindow
   .map(prop('href'))
   .map(split('/'));
 // IO(['http:', '', 'localhost:8000', 'blog', 'posts'])
-
 
 // $ :: String -> IO [DOM]
 const $ = selector => new IO(() => document.querySelectorAll(selector));
@@ -476,7 +474,6 @@ class IO {
 
 `IO` 会成为一个忠诚的伴侣，帮助我们驯化那些狂野的非纯操作。下一节我们将学习一种跟 `IO` 在精神上相似，但是用法上又千差万别的类型。
 
-
 ## 异步任务
 
 回调（callback）是通往地狱的狭窄的螺旋阶梯。它们是埃舍尔（译者注：荷兰版画艺术家）设计的控制流。看到一个个嵌套的回调挤在大小括号搭成的架子上，让人不由自主地联想到地牢里的灵薄狱（还能再低点么！）（译者注：灵薄狱即 limbo，基督教中地狱边缘之意）。光是想到这样的回调就让我幽闭恐怖症发作了。不过别担心，处理异步代码，我们有一种更好的方式，它的名字以“F”开头。
@@ -497,7 +494,6 @@ readFile('metamorphosis').map(split('\n')).map(head);
 // Task('One morning, as Gregor Samsa was waking up from anxious dreams, he discovered that
 // in bed he had been changed into a monstrous verminous bug.')
 
-
 // -- jQuery getJSON example -----------------------------------------
 
 // getJSON :: String -> {} -> Task Error JSON
@@ -507,7 +503,6 @@ const getJSON = curry((url, params) => new Task((reject, result) => {
 
 getJSON('/video', { id: 10 }).map(prop('title'));
 // Task('Family Matters ep 15')
-
 
 // -- Default Minimal Context ----------------------------------------
 
@@ -534,7 +529,6 @@ const renderPage = compose(blogPage, sortBy(prop('date')));
 
 // blog :: Params -> Task Error HTML
 const blog = compose(map(renderPage), getJSON('/posts'));
-
 
 // -- Impure calling code ----------------------------------------------
 blog({}).fork(
@@ -575,7 +569,6 @@ const connectDb = compose(map(Postgres.connect), dbUrl);
 // getConfig :: Filename -> Task Error (Either Error (IO DbConnection))
 const getConfig = compose(map(compose(connectDb, JSON.parse)), readFile);
 
-
 // -- Impure calling code ----------------------------------------------
 
 getConfig('db.json').fork(
@@ -589,7 +582,6 @@ getConfig('db.json').fork(
 例子我还可以再举一些，但是就到此为止吧。这些概念就像 `map` 一样简单。
 
 实际当中，你很有可能在一个工作流中跑好几个异步任务，但我们还没有完整学习容器的 api 来应对这种情况。不必担心，我们很快就会去学习 monad 之类的概念。不过，在那之前，我们得先检查下所有这些背后的数学知识。
-
 
 ## 一点理论
 
@@ -693,7 +685,6 @@ ctmd2.getCompose;
 
 看，只有一个 `map`。functor 组合是符合结合律的，而且之前我们定义的 `Container` 实际上是一个叫 `Identity` 的 functor。identity 和可结合的组合也能产生一个范畴，这个特殊的范畴的对象是其他范畴，态射是 functor。这实在太伤脑筋了，所以我们不会深入这个问题，但是赞叹一下这种模式的结构性含义，或者它的简单的抽象之美也是好的。
 
-
 ## 总结
 
 我们已经认识了几个不同的 functor，但它们的数量其实是无限的。有一些值得注意的可迭代数据类型（iterable data structure）我们没有介绍，像 tree、list、map 和 pair 等，以及所有你能说出来的。eventstream 和 observable 也都是 functor。其他的 functor 可能就是拿来做封装或者仅仅是模拟类型。我们身边到处都有 functor 的身影，本书也将会大量使用它们。
@@ -704,51 +695,51 @@ ctmd2.getCompose;
 
 1. 用 `add` 和 `map` 来创建一个能让 functor 里的值增加的函数
 
-```javascript
-// incrF :: Functor f => f Int -> f Int  
-const incrF = undefined;  
-```
+   ```javascript
+   // incrF :: Functor f => f Int -> f Int  
+   const incrF = undefined;  
+   ```
 
 2. 给定以下形式的数据
 
-```javascript
-const user = { id: 2, name: 'Albert', active: true };  
-```
+   ```javascript
+   const user = { id: 2, name: 'Albert', active: true };  
+   ```
 
-使用 `safeProp` 和 `head` 获取 user 的名字的首字母
+   使用 `safeProp` 和 `head` 获取 user 的名字的首字母
 
-```javascript
-// initial :: User -> Maybe String  
-const initial = undefined;  
-```
+   ```javascript
+   // initial :: User -> Maybe String  
+   const initial = undefined;  
+   ```
 
 3. 给定以下辅助函数
 
-```javascript
-// showWelcome :: User -> String
-const showWelcome = compose(append('Welcome '), prop('name'));
+   ```javascript
+   // showWelcome :: User -> String
+   const showWelcome = compose(append('Welcome '), prop('name'));
 
-// checkActive :: User -> Either String User
-const checkActive = function checkActive(user) {
-  return user.active
-    ? Either.of(user)
-    : left('Your account is not active');
-};
-```
+   // checkActive :: User -> Either String User
+   const checkActive = function checkActive(user) {
+     return user.active
+       ? Either.of(user)
+       : left('Your account is not active');
+   };
+   ```
 
-写一个函数，使用 `checkActive` 和 `showWelcome` 分别允许访问或返回错误
+   写一个函数，使用 `checkActive` 和 `showWelcome` 分别允许访问或返回错误
 
-```javascript
-// eitherWelcome :: User -> Either String String
-const eitherWelcome = undefined;
-```
+   ```javascript
+   // eitherWelcome :: User -> Either String String
+   const eitherWelcome = undefined;
+   ```
 
 4. 写一个 `validateName` 函数，检查参数是否 `length > 3`。如果是就返回 `Right(x)`，否则就返回 `Left("You need > 3")`。然后，用 `either`、`showWelcome` 和 `save` 写一个 `refister` 函数用于用户的注册和欢迎。别忘了 either 的两个参数必须返回同一类型的数据。
 
-```javascript
-// validateName :: User -> Either String ()
-const validateName = undefined;
+   ```javascript
+   // validateName :: User -> Either String ()
+   const validateName = undefined;
 
-// register :: User -> IO String
-const register = compose(undefined, validateUser(validateName));
-```
+   // register :: User -> IO String
+   const register = compose(undefined, validateUser(validateName));
+   ```

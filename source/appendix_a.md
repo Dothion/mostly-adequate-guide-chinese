@@ -13,14 +13,12 @@
 const always = curry((a, b) => a);
 ```
 
-
 ## compose
 
 ```javascript
 // compose :: ((y -> z), (x -> y),  ..., (a -> b)) -> a -> z
 const compose = (...fns) => (...args) => fns.reduceRight((res, fn) => [fn.call(null, ...res)], args)[0];
 ```
-
 
 ## curry
 
@@ -39,7 +37,6 @@ function curry(fn) {
 }
 ```
 
-
 ## either
 
 ```javascript
@@ -53,14 +50,12 @@ const either = curry((f, g, e) => {
 });
 ```
 
-
 ## identity
 
 ```javascript
 // identity :: x -> x
 const identity = x => x;
 ```
-
 
 ## inspect
 
@@ -96,14 +91,12 @@ const inspect = (x) => {
 };
 ```
 
-
 ## left
 
 ```javascript
 // left :: a -> Either a b
 const left = a => new Left(a);
 ```
-
 
 ## liftA2
 
@@ -112,14 +105,12 @@ const left = a => new Left(a);
 const liftA2 = curry((fn, a1, a2) => a1.map(fn).ap(a2));
 ```
 
-
 ## liftA3
 
 ```javascript
 // liftA3 :: (Applicative f) => (a1 -> a2 -> a3 -> b) -> f a1 -> f a2 -> f a3 -> f b
 const liftA3 = curry((fn, a1, a2, a3) => a1.map(fn).ap(a2).ap(a3));
 ```
-
 
 ## maybe
 
@@ -134,7 +125,6 @@ const maybe = curry((v, f, m) => {
 });
 ```
 
-
 ## nothing
 
 ```javascript
@@ -142,8 +132,7 @@ const maybe = curry((v, f, m) => {
 const nothing = Maybe.of(null);
 ```
 
-
-## reject 
+## reject
 
 ```javascript
 // reject :: a -> Task a b

@@ -17,7 +17,6 @@ for (let i = 0; i < cars.length; i += 1) {
   makes.push(cars[i].make);
 }
 
-
 // 声明式
 const makes = cars.map(car => car.make);
 ```

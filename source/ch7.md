@@ -97,7 +97,7 @@ const reduce = curry((f, x, xs) => xs.reduce(f, x));
 
 ## 缩小可能性范围
 
-一旦引入一个类型变量，就会出现一个奇怪的特性叫做 *parametricity*（http://en.wikipedia.org/wiki/Parametricity ）。这个特性表明，函数将会*以一种统一的行为作用于所有的类型*。我们来研究下：
+一旦引入一个类型变量，就会出现一个奇怪的特性叫做 *[parametricity](http://en.wikipedia.org/wiki/Parametricity)*。这个特性表明，函数将会*以一种统一的行为作用于所有的类型*。我们来研究下：
 
 ```javascript
 // head :: [a] -> a

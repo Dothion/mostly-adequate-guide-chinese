@@ -138,7 +138,6 @@ const latin = compose(map, angry, reverse);
 
 latin(['frog', 'eyes']); // error
 
-
 // 正确做法：每个函数都接受一个实际参数。
 const latin = compose(map(angry), reverse);
 
@@ -206,22 +205,22 @@ dasherize('The world is a vampire'); // 'the-world-is-a-vampire'
 
 在范畴学中，有一个概念叫做...范畴。有着以下这些组件（component）的搜集（collection）就构成了一个范畴：
 
-  * 对象的搜集
-  * 态射的搜集
-  * 态射的组合
-  * identity 这个独特的态射
+-- 对象的搜集
+-- 态射的搜集
+-- 态射的组合
+-- identity 这个独特的态射
 
 范畴学抽象到足以模拟任何事物，不过目前我们最关心的还是类型和函数，所以让我们把范畴学运用到它们身上看看。
 
-**对象的搜集**
+- **对象的搜集**
 
 对象就是数据类型，例如 `String`、`Boolean`、`Number` 和 `Object` 等等。通常我们把数据类型视作所有可能的值的一个集合（set）。像 `Boolean` 就可以看作是 `[true, false]` 的集合，`Number` 可以是所有实数的一个集合。把类型当作集合对待是有好处的，因为我们可以利用集合论（set theory）处理类型。
 
-**态射的搜集**
+- **态射的搜集**
 
 态射是标准的、普通的纯函数。
 
-**态射的组合**
+- **态射的组合**
 
 你可能猜到了，这就是本章介绍的新玩意儿——`组合`。我们已经讨论过 `compose` 函数是符合结合律的，这并非巧合，结合律是在范畴学中对任何组合都适用的一个特性。
 
@@ -238,7 +237,7 @@ const f = x => x === 4;
 const isFourLetterWord = compose(f, g);
 ```
 
-**identity 这个独特的态射**
+- **identity 这个独特的态射**
 
 让我们介绍一个名为 `id` 的实用函数。这个函数接受随便什么输入然后原封不动地返回它：
 
@@ -287,32 +286,31 @@ compose(id, f) === compose(f, id) === f;
 
 1. 用 `compose` 重写下面的函数
 
-```javascript
-const isLastInStock = (cars) => {  
-  const lastCar = last(cars);  
-  return prop('in_stock', lastCar);  
-};  
-```
+   ```javascript
+   const isLastInStock = (cars) => {  
+     const lastCar = last(cars);  
+     return prop('in_stock', lastCar);  
+   };  
+   ```
 
 2. 用帮助函数 `average` 重写 `averageDollarValue` 函数
 
-```javascript
-const average = xs => reduce(add, 0, xs) / xs.length;
-const averageDollarValue = (cars) => {  
-  const dollarValues = map(c => c.dollar_value, cars);  
-  return average(dollarValues);  
-};  
-```
+   ```javascript
+   const average = xs => reduce(add, 0, xs) / xs.length;
+   const averageDollarValue = (cars) => {  
+     const dollarValues = map(c => c.dollar_value, cars);  
+     return average(dollarValues);  
+   };  
+   ```
 
 3. 用 `compose` 重写 `fastestCar` 函数
 
-> 提示：`append` 函数可能会很有用。
+   > 提示：`append` 函数可能会很有用。
 
-```javascript
-const fastestCar = (cars) => {  
-  const sorted = sortBy(car => car.horsepower);  
-  const fastest = last(sorted);  
-  return concat(fastest.name, ' is the fastest');  
-};  
-```
-
+   ```javascript
+   const fastestCar = (cars) => {  
+     const sorted = sortBy(car => car.horsepower);  
+     const fastest = last(sorted);  
+     return concat(fastest.name, ' is the fastest');  
+   };  
+   ```

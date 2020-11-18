@@ -18,7 +18,6 @@ xs.slice(0,3); // [1,2,3]
 
 xs.slice(0,3); // [1,2,3]
 
-
 // 不纯的
 xs.splice(0,3); // [1,2,3]
 
@@ -45,7 +44,9 @@ const checkAge = (age) => {
 
 在不纯的版本中，`checkAge` 的结果将取决于 `minimum` 这个可变变量的值。换句话说，它取决于系统状态（system state）；这一点令人沮丧，因为它引入了外部的环境，从而增加了认知负荷（cognitive load）。
 
-这个例子可能还不是那么明显，但这种依赖状态是影响系统复杂度的罪魁祸首（http://www.curtclifton.net/storage/papers/MoseleyMarks06a.pdf ）。输入值之外的因素能够左右 `checkAge` 的返回值，不仅让它变得不纯，而且导致每次我们思考整个软件的时候都痛苦不堪。
+这个例子可能还不是那么明显，但这种依赖状态是影响系统复杂度的罪魁祸首[^ref1]。输入值之外的因素能够左右 `checkAge` 的返回值，不仅让它变得不纯，而且导致每次我们思考整个软件的时候都痛苦不堪。
+
+[^ref1]: 见 Moseley, Ben, and Peter Marks. [Out of the tar pit](http://www.curtclifton.net/storage/papers/MoseleyMarks06a.pdf)
 
 另一方面，使用纯函数的形式，函数就能做到自给自足。我们也可以让 `minimum` 成为一个不可变（immutable）对象，这样就能保留纯粹性，因为状态不会有变化。要实现这个效果，必须得创建一个对象，然后调用 `Object.freeze` 方法：
 
@@ -53,7 +54,7 @@ const checkAge = (age) => {
 const immutableState = Object.freeze({ minimum: 21 });
 ```
 
-## 副作用可能包括...
+## 副作用可能包括…
 
 让我们来仔细研究一下“副作用”以便加深理解。那么，我们在*纯函数*定义中提到的万分邪恶的*副作用*到底是什么？“作用”我们可以理解为一切除结果计算之外发生的事情。
 
@@ -63,14 +64,14 @@ const immutableState = Object.freeze({ minimum: 21 });
 
 副作用可能包含，但不限于：
 
-  * 更改文件系统
-  * 往数据库插入记录
-  * 发送一个 http 请求
-  * 可变数据
-  * 打印/log
-  * 获取用户输入
-  * DOM 查询
-  * 访问系统状态
+- 更改文件系统
+- 往数据库插入记录
+- 发送一个 http 请求
+- 可变数据
+- 打印/log
+- 获取用户输入
+- DOM 查询
+- 访问系统状态
 
 这个列表还可以继续写下去。概括来讲，只要是跟函数外部环境发生的交互就都是副作用——这一点可能会让你怀疑无副作用编程的可行性。函数式编程的哲学就是假定副作用是造成不正当行为的主要原因。
 

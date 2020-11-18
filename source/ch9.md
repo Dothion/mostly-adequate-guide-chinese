@@ -358,7 +358,6 @@ compose(join, of) === compose(join, map(of)) === id;
 
 我已经见过这些定律了，同一律和结合律，以前就在哪儿见过...等一下，让我想想...是的！它们是范畴遵循的定律！不过这意味着我们需要一个组合函数来给出一个完整定义。见证吧：
 
-
 ```javascript
 const mcompose = (f, g) => compose(chain(f), g);
 
@@ -373,7 +372,6 @@ mcompose(mcompose(f, g), h) === mcompose(f, mcompose(g, h));
 ```
 
 毕竟它们是范畴学里的定律。monad 来自于一个叫 “Kleisli 范畴”的范畴，这个范畴里边所有的对象都是 monad，所有的态射都是联结函数（chained funtions）。我不是要在没有提供太多解释的情况下，拿范畴学里各式各样的概念来取笑你。我的目的是涉及足够多的表面知识，向你说明这中间的相关性，让你在关注日常实用特性之余，激发起对这些定律的兴趣。
-
 
 ## 总结
 
@@ -402,42 +400,41 @@ const user = {
 
 1. 用 `safeProp` 和 `map`/`join` 或 `chain` 安全地获取 `street` 的 `name`
 
-```javascript
-// getStreetName :: User -> Maybe String  
-const getStreetName = undefined;  
-
-```
+   ```javascript
+   // getStreetName :: User -> Maybe String  
+   const getStreetName = undefined;  
+   ```
 
 2. 考虑以下对象：
 
-```javascript
-// getFile :: IO String
-const getFile = IO.of('/home/mostly-adequate/ch09.md');
+   ```javascript
+   // getFile :: IO String
+   const getFile = IO.of('/home/mostly-adequate/ch09.md');
 
-// pureLog :: String -> IO ()
-const pureLog = str => new IO(() => console.log(str));
-```
+   // pureLog :: String -> IO ()
+   const pureLog = str => new IO(() => console.log(str));
+   ```
 
-使用 `getFile` 获取文件名，删除目录只保留文件名，然后用纯函数的形式打印出来。
+   使用 `getFile` 获取文件名，删除目录只保留文件名，然后用纯函数的形式打印出来。
 
-> 提示：你可能要用 `split` 和 `last` 来得到文件名
+   > 提示：你可能要用 `split` 和 `last` 来得到文件名
 
-```javascript
-// logFilename :: IO ()  
-const logFilename = undefined;  
-```
-
+   ```javascript
+   // logFilename :: IO ()  
+   const logFilename = undefined;  
+   ```
 
 3. 给定类型签名如下的帮助函数
 
-```javascript
-// validateEmail :: Email -> Either String Email
-// addToMailingList :: Email -> IO([Email])
-// emailBlast :: [Email] -> IO ()
-```
+   ```javascript
+   // validateEmail :: Email -> Either String Email
+   // addToMailingList :: Email -> IO([Email])
+   // emailBlast :: [Email] -> IO ()
+   ```
 
-用 `validateEmail`、`addToMailingList` 和 `emailBlast` 实现下面的函数
-```javascript
-// joinMailingList :: Email -> Either String (IO ())  
-const joinMailingList = undefined;  
-```
+   用 `validateEmail`、`addToMailingList` 和 `emailBlast` 实现下面的函数
+
+   ```javascript
+   // joinMailingList :: Email -> Either String (IO ())  
+   const joinMailingList = undefined;  
+   ```

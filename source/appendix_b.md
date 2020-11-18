@@ -275,7 +275,6 @@ class List {
 }
 ```
 
-
 ## Map
 
 ```javascript
@@ -320,7 +319,6 @@ class Map {
   }
 }
 ```
-
 
 ## Maybe
 

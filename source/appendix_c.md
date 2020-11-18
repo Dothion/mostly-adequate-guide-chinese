@@ -6,7 +6,7 @@
 
 请注意，这些实现依赖于[附录 A](./appendix_a.md) 中实现的 `curry` 和 `compose` 函数。
 
-## add 
+## add
 
 ```javascript
 // add :: Number -> Number -> Number
@@ -55,7 +55,7 @@ const filter = curry((fn, xs) => xs.filter(fn));
 const flip = curry((fn, a, b) => fn(b, a));
 ```
 
-## forEach 
+## forEach
 
 ```javascript
 // forEach :: (a -> ()) -> [a] -> ()
@@ -104,7 +104,7 @@ const map = curry((fn, f) => f.map(fn));
 const match = curry((re, str) => re.test(str));
 ```
 
-## prop 
+## prop
 
 ```javascript
 // prop :: String -> Object -> a

@@ -94,14 +94,14 @@ curry 函数用起来非常得心应手，每天使用它对我来说简直就�
 
 1. 通过局部调用移除下面函数的所有参数：
 
-```javascript
-const words = str => split(' ', str);  
-const filterQs = xs => filter(x => match(/q/i, x), xs);
-```
+   ```javascript
+   const words = str => split(' ', str);  
+   const filterQs = xs => filter(x => match(/q/i, x), xs);
+   ```
 
 2. 使用帮助函数 `keepHighest` 重构 `max` 函数，使之成为 curry 函数
 
-```javascript
-const keepHighest = (x, y) => (x >= y ? x : y);  
-const max = xs => reduce((acc, x) => (x >= acc ? x : acc), -Infinity, xs);  
-```
+   ```javascript
+   const keepHighest = (x, y) => (x >= y ? x : y);  
+   const max = xs => reduce((acc, x) => (x >= acc ? x : acc), -Infinity, xs);  
+   ```
