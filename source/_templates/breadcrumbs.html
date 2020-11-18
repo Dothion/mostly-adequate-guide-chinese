@@ -39,8 +39,8 @@
         {% if hasdoc(pagename) %}
             
             {%- if commit %}
-            <span class="commit" style="color:grey">
-              版本 <code>{{ commit }}</code>
+            <span class="commit">
+              <code style="color:grey">{{ commit }}</code>
             </span>
             {%- endif %}
 
