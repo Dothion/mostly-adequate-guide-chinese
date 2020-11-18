@@ -10,6 +10,9 @@ maxdepth: 1
 ---
 intro.md
 ```
+
+### 第一部分
+
 ```{toctree}
 ---
 maxdepth: 2
@@ -21,6 +24,15 @@ ch3.md
 ch4.md
 ch5.md
 ch6.md
+```
+
+### 第二部分
+
+```{toctree}
+---
+maxdepth: 2
+numbered: true
+---
 ch7.md
 ch8.md
 ch9.md
@@ -29,6 +41,9 @@ ch11.md
 ch12.md
 ch13.md
 ```
+
+### 附录
+
 ```{toctree}
 ---
 maxdepth: 1
