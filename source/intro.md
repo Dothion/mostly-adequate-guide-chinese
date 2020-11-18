@@ -33,11 +33,6 @@
 本作品采用 [CC BY-SA 4.0](http://creativecommons.org/licenses/by/4.0/) 协议进行许可。
 
 
-## 在线阅读
-
-你可以在 [Read the Docs](http://magc.rtfd.io/) 上阅读本书，或[下载 epub ](https://magc.readthedocs.io/_/downloads/zh_CN/latest/epub/)以获得更好的阅读体验。
-
-
 ## 鸣谢
 
 - [MostlyAdequate/mostly-adequate-guide](https://github.com/MostlyAdequate/mostly-adequate-guide)
