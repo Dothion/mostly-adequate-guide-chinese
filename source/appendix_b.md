@@ -1,17 +1,14 @@
-# Appendix B: Algebraic Structures Support
+# 附录 B: 实用数据类型
 
-In this appendix, you'll find some basic JavaScript implementations of various algebraic
-structures described in the book. Keep in mind that these implementations may not be the fastest or the
-most efficient implementation out there; they *solely serve an educational purpose*.
+本附录将会给出书中所述的几种数据类型的 JavaScript 实现。请注意，这里的实现可能不是最快或者效率最高的，只用于教育目的。
 
-In order to find structures that are more production-ready, have a peek at [folktale](http://folktale.origamitower.com/)
-or [fantasy-land](https://github.com/fantasyland).
+如果需要这些数据类型适用于生产环境的版本，可以选用 [folktale](http://folktale.origamitower.com/) 或 [fantasy-land](https://github.com/fantasyland).
 
-Note that some methods also refer to functions defined in the [Appendix A](./appendix_a.md)
+请注意，其中一些数据类型依赖于[附录 A](./appendix_b.md) 中实现的函数。
 
 ## Compose
 
-```js
+```javascript
 const createCompose = curry((F, G) => class Compose {
   constructor(x) {
     this.$value = x;
@@ -40,7 +37,7 @@ const createCompose = curry((F, G) => class Compose {
 
 ## Either
 
-```js
+```javascript
 class Either {
   constructor(x) {
     this.$value = x;
@@ -55,7 +52,7 @@ class Either {
 
 ### Left
 
-```js
+```javascript
 class Left extends Either {
   get isLeft() {
     return true;
@@ -105,7 +102,7 @@ class Left extends Either {
 
 ### Right
 
-```js
+```javascript
 class Right extends Either {
   get isLeft() {
     return false;
@@ -155,7 +152,7 @@ class Right extends Either {
 
 ## Identity
 
-```js
+```javascript
 class Identity {
   constructor(x) {
     this.$value = x;
@@ -202,7 +199,7 @@ class Identity {
 
 ## IO
 
-```js
+```javascript
 class IO {
   constructor(fn) {
     this.unsafePerformIO = fn;
@@ -240,7 +237,7 @@ class IO {
 
 ## List
 
-```js
+```javascript
 class List {
   constructor(xs) {
     this.$value = xs;
@@ -281,7 +278,7 @@ class List {
 
 ## Map
 
-```js
+```javascript
 class Map {
   constructor(x) {
     this.$value = x;
@@ -327,10 +324,9 @@ class Map {
 
 ## Maybe
 
-> Note that `Maybe` could also be defined in a similar fashion as we did for `Either` with two 
-> child classes `Just` and `Nothing`. This is simply a different flavor.
+> 请注意，`Maybe` 也可以像 `Either` 那样，用两个子类来实现。这里给出的是另一种实现形式。
 
-```js
+```javascript
 class Maybe {
   get isNothing() {
     return this.$value === null || this.$value === undefined;
@@ -385,7 +381,7 @@ class Maybe {
 
 ## Task
 
-```js
+```javascript
 class Task {
   constructor(fork) {
     this.fork = fork;

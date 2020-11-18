@@ -1,17 +1,14 @@
-# Appendix A: Essential Functions Support
+# 附录 A: 常用 JavaScript 函数
 
-In this appendix, you'll find some basic JavaScript implementations of various functions
-described in the book. Keep in mind that these implementations may not be the fastest or the
-most efficient implementation out there; they *solely serve an educational purpose*.
+本附录将会给出书中所述的几种基本函数的实现。请注意，这里的实现可能不是最快或者效率最高的，只用于教育目的。
 
-In order to find functions that are more production-ready, have a peek at
-[ramda](https://ramdajs.com/), [lodash](https://lodash.com/), or [folktale](http://folktale.origamitower.com/).
+如果需要这些函数适用于生产环境的版本，可以选用 [ramda](https://ramdajs.com/)、[lodash](https://lodash.com/), 或者 [folktale](http://folktale.origamitower.com/).
 
-Note that some functions also refer to algebraic structures defined in the [Appendix B](./appendix_b.md)
+请注意，其中一些函数依赖于[附录 B](./appendix_b.md) 中实现的数据类型。
 
 ## always
 
-```js
+```javascript
 // always :: a -> b -> a
 const always = curry((a, b) => a);
 ```
@@ -19,7 +16,7 @@ const always = curry((a, b) => a);
 
 ## compose
 
-```js
+```javascript
 // compose :: ((y -> z), (x -> y),  ..., (a -> b)) -> a -> z
 const compose = (...fns) => (...args) => fns.reduceRight((res, fn) => [fn.call(null, ...res)], args)[0];
 ```
@@ -27,7 +24,7 @@ const compose = (...fns) => (...args) => fns.reduceRight((res, fn) => [fn.call(n
 
 ## curry
 
-```js
+```javascript
 // curry :: ((a, b, ...) -> c) -> a -> b -> ... -> c
 function curry(fn) {
   const arity = fn.length;
@@ -45,7 +42,7 @@ function curry(fn) {
 
 ## either
 
-```js
+```javascript
 // either :: (a -> c) -> (b -> c) -> Either a b -> c
 const either = curry((f, g, e) => {
   if (e.isLeft) {
@@ -59,7 +56,7 @@ const either = curry((f, g, e) => {
 
 ## identity
 
-```js
+```javascript
 // identity :: x -> x
 const identity = x => x;
 ```
@@ -67,7 +64,7 @@ const identity = x => x;
 
 ## inspect
 
-```js
+```javascript
 // inspect :: a -> String
 const inspect = (x) => {
   if (x && typeof x.inspect === 'function') {
@@ -102,7 +99,7 @@ const inspect = (x) => {
 
 ## left
 
-```js
+```javascript
 // left :: a -> Either a b
 const left = a => new Left(a);
 ```
@@ -110,7 +107,7 @@ const left = a => new Left(a);
 
 ## liftA2
 
-```js
+```javascript
 // liftA2 :: (Applicative f) => (a1 -> a2 -> b) -> f a1 -> f a2 -> f b
 const liftA2 = curry((fn, a1, a2) => a1.map(fn).ap(a2));
 ```
@@ -118,7 +115,7 @@ const liftA2 = curry((fn, a1, a2) => a1.map(fn).ap(a2));
 
 ## liftA3
 
-```js
+```javascript
 // liftA3 :: (Applicative f) => (a1 -> a2 -> a3 -> b) -> f a1 -> f a2 -> f a3 -> f b
 const liftA3 = curry((fn, a1, a2, a3) => a1.map(fn).ap(a2).ap(a3));
 ```
@@ -126,7 +123,7 @@ const liftA3 = curry((fn, a1, a2, a3) => a1.map(fn).ap(a2).ap(a3));
 
 ## maybe
 
-```js
+```javascript
 // maybe :: b -> (a -> b) -> Maybe a -> b
 const maybe = curry((v, f, m) => {
   if (m.isNothing) {
@@ -140,7 +137,7 @@ const maybe = curry((v, f, m) => {
 
 ## nothing
 
-```js
+```javascript
 // nothing :: Maybe a
 const nothing = Maybe.of(null);
 ```
@@ -148,7 +145,7 @@ const nothing = Maybe.of(null);
 
 ## reject 
 
-```js
+```javascript
 // reject :: a -> Task a b
 const reject = a => Task.rejected(a);
 ```
