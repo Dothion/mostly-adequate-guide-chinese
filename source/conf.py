@@ -77,7 +77,7 @@ html_static_path = ['_static']
 # -- Options for epub output -------------------------------------------------
 
 epub_description = '函数式编程指北 中文版'
-epub_cover = './img/cover.png'
+epub_cover = ('./img/cover.png', '')
 # latex_use_xindy = False
 # latex_elements = {
 #     'preamble': '\\usepackage[UTF8]{ctex}\n',
