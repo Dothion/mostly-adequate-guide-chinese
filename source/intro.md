@@ -1,8 +1,4 @@
-# 函数式编程指北
-
-> This is the Simplified Chinese translation of *[mostly-adequate-guide](https://github.com/MostlyAdequate/mostly-adequate-guide)*, thank Professor [Franklin Risby](https://github.com/DrBoolean) for his great work!
-
-## 关于本书
+# 关于本书
 
 这本书的主题是函数范式（functional paradigm），我们将使用 JavaScript 这个世界上最流行的函数式编程语言来讲述这一主题。有人可能会觉得选择 JavaScript 并不明智，因为当前的主流观点认为它是一门命令式（imperative）的语言，并不适合用来讲函数式。但我认为，这是学习函数式编程的最好方式，因为：
 
@@ -26,18 +22,4 @@
 * 第 1 部分是基础知识。这是初版草稿，所以我会及时更正发现的的错误。欢迎提供帮助！
 * 第 2 部分讲述类型类（type class），比如 functor 和 monad，最后会讲到到 traversable。我希望能塞进来一些 monad transformer 相关的知识，再写一个纯函数的应用。
 * 第 3 部分将开始游走于编程实践与学院学究之间。我们将学习 comonad、f-algebra、free monad、米田定理以及其他一些范畴学概念。
-
-
-## LICENSE
-
-本作品所有文字采用 [CC BY-SA 4.0](http://creativecommons.org/licenses/by/4.0/) 协议进行许可。
-
-所有的图片都取自 Google 图片搜索，所以上述许可对这些图片不适用。如果图片中有你的作品，请务必告知我，我会注明出处并致谢或删除图片。
-
-
-## 鸣谢
-
-- [MostlyAdequate/mostly-adequate-guide](https://github.com/MostlyAdequate/mostly-adequate-guide)
-
-- [llh911001/mostly-adequate-guide-chinese](https://github.com/llh911001/mostly-adequate-guide-chinese)
 
