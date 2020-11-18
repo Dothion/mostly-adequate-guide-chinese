@@ -32,11 +32,6 @@
 * 第 3 部分将开始游走于编程实践与学院学究之间。我们将学习 comonad、f-algebra、free monad、米田定理以及其他一些范畴学概念。
 
 
-## LICENSE
-
-本作品采用 [CC BY-SA 4.0](http://creativecommons.org/licenses/by/4.0/) 协议进行许可。
-
-
 ## Epub 构建
 
 ```
@@ -52,6 +47,11 @@ copy .\build\epub\sphinx.epub '.\函数式编程指北.epub'
 ## 在线阅读
 
 你可以在 [Read the Docs](http://magc.rtfd.io/) 上阅读本书，或[下载 epub ](https://magc.readthedocs.io/_/downloads/zh_CN/latest/epub/)以获得更好的阅读体验。
+
+
+## LICENSE
+
+本作品采用 [CC BY-SA 4.0](http://creativecommons.org/licenses/by/4.0/) 协议进行许可。
 
 
 ## 鸣谢
