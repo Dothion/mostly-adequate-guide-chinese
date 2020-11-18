@@ -79,5 +79,5 @@ html_static_path = ['_static']
 epub_title = '函数式编程指北'
 epub_scheme = 'URL'
 epub_identifier = 'http://magc.rtfd.io/'
-epub_description = '函数式编程指北 中文版'
+epub_description = ''
 epub_cover = ('./img/cover.png', '')
