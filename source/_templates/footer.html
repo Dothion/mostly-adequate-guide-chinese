@@ -54,20 +54,6 @@
       {%- endif %}
       -->
 
-      {%- if build_id and build_url %}
-      <span class="build">
-        构建 <a href="{{ build_url }}">{{ build_id }}</a>
-      </span>
-      {%- elif commit %}
-      <span class="commit">
-        版本 <code>{{ commit }}</code>
-      </span>
-      {%- elif last_updated %}
-      <span class="lastupdated">
-        上次更新于 {{ last_updated }}
-      </span>
-      {%- endif %}
-
     </p>
   </div>
 
