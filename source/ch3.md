@@ -94,13 +94,17 @@ const immutableState = Object.freeze({ minimum: 21 });
 
 ![relation-not-function](img/relation-not-function.gif)
 
-> 见 <(http://www.mathsisfun.com/sets/function.html>
+> 见 <http://www.mathsisfun.com/sets/function.html>
 
 函数可以描述为一个集合，这个集合里的内容是 (输入, 输出) 对：`[(1,2), (3,6), (5,10)]`（看起来这个函数是把输入值加倍）。
 
 或者一张表：
 
-<table> <tr> <th>输入</th> <th>输出</th> </tr> <tr> <td>1</td> <td>2</td> </tr> <tr> <td>2</td> <td>4</td> </tr> <tr> <td>3</td> <td>6</td> </tr> </table>
+| 输入 | 输出 |
+| ---- | ---- |
+| 1    | 2    |
+| 2    | 4    |
+| 3    | 6    |
 
 甚至一个以 `x` 为输入 `y` 为输出的函数曲线图：
 
