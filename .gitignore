@@ -1,2 +1,6 @@
-build.bat
+build.ps1
 build/
+*.pdf
+*.epub
+*.mobi
+*.azw3
